@@ -482,20 +482,31 @@ useEffect(() => {
             };
 
             const addPlayer = useCallback((formData) => {
-                if (formData.nom && formData.nom.trim()) {
-                    const player = {
-                        ...formData,
-                        id: Date.now(),
-                        totalPoints: calculatePlayerPoints(formData),
-                        levelColor: getLevelColor(calculatePlayerPoints(formData))
-                    };
-                    setPlayers(prev => [...prev, player]);
-                    showNotification('Joueur ajouté avec succès !');
-                    setShowPlayerForm(false);
-                } else {
-                    showNotification('Veuillez saisir un nom pour le joueur', 'error');
-                }
-            }, [calculatePlayerPoints, setPlayers]);
+    if (formData.nom && formData.nom.trim()) {
+        const player = {
+            ...formData,
+            id: Date.now(),
+            totalPoints: calculatePlayerPoints(formData),
+            levelColor: getLevelColor(calculatePlayerPoints(formData))
+        };
+
+        // 🔁 Envoi vers Google Sheets
+        fetch("https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec", {
+            method: "POST",
+            body: JSON.stringify(player),
+            headers: { "Content-Type": "application/json" }
+        }).then(() => {
+            setPlayers(prev => [...prev, player]);
+            showNotification('Joueur ajouté et sauvegardé !');
+            setShowPlayerForm(false);
+        }).catch(() => {
+            showNotification("Erreur de sauvegarde Google Sheets", "error");
+        });
+
+    } else {
+        showNotification('Veuillez saisir un nom pour le joueur', 'error');
+    }
+}, [calculatePlayerPoints, setPlayers]);
 
             const updatePlayer = useCallback((updatedPlayer) => {
                 updatedPlayer.totalPoints = calculatePlayerPoints(updatedPlayer);
