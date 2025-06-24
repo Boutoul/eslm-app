@@ -4,6 +4,78 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ESLM - App</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+  <div id="root">Chargement...</div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec";
+
+    function App() {
+      const [players, setPlayers] = useState([]);
+      const [nom, setNom] = useState("");
+
+      useEffect(() => {
+        fetch(GOOGLE_SHEET_URL)
+          .then(res => res.json())
+          .then(data => setPlayers(data))
+          .catch(err => console.error("Erreur de chargement", err));
+      }, []);
+
+      const addPlayer = () => {
+        const newPlayer = {
+          id: Date.now(),
+          nom: nom,
+          starRating: 3,
+          totalPoints: 30,
+          preferredPosition: "milieu",
+          acceptedPositions: "milieu",
+          footedness: "droitier",
+          speed: "normal",
+          heading: "normal",
+          endurance: "normal",
+          technique: "normal",
+          present: true,
+          activities: {}
+        };
+
+        fetch(GOOGLE_SHEET_URL, {
+          method: "POST",
+          body: JSON.stringify(newPlayer),
+          headers: { "Content-Type": "application/json" }
+        })
+        .then(() => {
+          setPlayers([...players, newPlayer]);
+          setNom("");
+        })
+        .catch(err => console.error("Erreur d'enregistrement", err));
+      };
+
+      return (
+        <div>
+          <h1>Liste des joueurs</h1>
+          <ul>{players.map(p => <li key={p.id}>{p.nom}</li>)}</ul>
+          <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Nom du joueur" />
+          <button onClick={addPlayer}>Ajouter joueur</button>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestionnaire d'Équipe ESLM - Football Amateur</title>
