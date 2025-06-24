@@ -419,7 +419,25 @@
                 }
             });
 
-            const [players, setPlayers] = useLocalStorage('footballPlayers', []);
+            const [players, setPlayers] = useState([]);
+
+useEffect(() => {
+    fetch("https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec")
+        .then((res) => res.json())
+        .then((data) => {
+            const processed = data.map(p => ({
+                ...p,
+                id: Number(p.id),
+                starRating: Number(p.starRating || 3),
+                totalPoints: calculatePlayerPoints(p),
+                levelColor: getLevelColor(calculatePlayerPoints(p)),
+                present: String(p.present).toLowerCase() === 'true'
+            }));
+            setPlayers(processed);
+        })
+        .catch((err) => console.error("Erreur chargement Google Sheet:", err));
+}, []);
+
             
             const [newPlayer, setNewPlayer] = useState({
                 nom: '',
