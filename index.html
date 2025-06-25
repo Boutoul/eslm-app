@@ -23,7 +23,17 @@
     .controls select, .controls button {
       padding: 5px 10px; font-size: 16px;
     }
+    .container {
+      display: flex; flex-wrap: wrap;
+    }
+    .player-list {
+      flex: 1; min-width: 280px; background: #222; padding: 10px;
+    }
+    .player-list label {
+      display: flex; justify-content: space-between; padding: 3px 0;
+    }
     .terrain {
+      flex: 2;
       position: relative;
       background: url('https://i.postimg.cc/k4jZTVr8/terrain-pro.png') no-repeat center center;
       background-size: cover;
@@ -68,7 +78,10 @@
     <button onclick="generate()">🎲 Générer</button>
   </div>
 
-  <div id="root">Chargement…</div>
+  <div class="container">
+    <div class="player-list" id="presence-list">Chargement des joueurs...</div>
+    <div id="root">Chargement terrain…</div>
+  </div>
 
   <script type="text/babel">
     const TACTICS = {
@@ -86,84 +99,85 @@
 
     const SHEET_URL = "https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec";
 
-    function App() {
-      const [players, setPlayers] = React.useState([]);
-      const [tactic, setTactic] = React.useState("4-4-2");
+    let allPlayers = [];
+    let presenceState = {};
 
-      React.useEffect(() => {
-        fetch(SHEET_URL)
-          .then(res => res.json())
-          .then(data => {
-            const actifs = data.filter(p => String(p["présent"]).toLowerCase() === "true");
-            actifs.forEach(p => p.points = parseInt(p.points) || 0);
-            actifs.sort((a, b) => b.points - a.points);
-            setPlayers(actifs);
-          });
-      }, []);
+    function updatePresenceList(players, callback) {
+      const container = document.getElementById("presence-list");
+      container.innerHTML = "";
+      players.forEach(p => {
+        const row = document.createElement("label");
+        row.innerHTML = `<span>${p.nom}</span>`;
+        const box = document.createElement("input");
+        box.type = "checkbox";
+        box.checked = String(p["présent"]).toLowerCase() === "true";
+        presenceState[p.id] = box.checked;
+        box.onchange = () => {
+          presenceState[p.id] = box.checked;
+          callback();
+        };
+        row.appendChild(box);
+        container.appendChild(row);
+      });
+    }
 
-      const assignPlayers = () => {
-        const compo = TACTICS[tactic];
-        const titulaires = [];
-        const remplaçants = [];
-        const posteMap = { Gardien: "G", Défenseur: "D", Milieu: "M", Attaquant: "A" };
+    function App({ tactic }) {
+      const actifs = allPlayers
+        .filter(p => presenceState[p.id])
+        .sort((a, b) => (parseInt(b.points || 0) - parseInt(a.points || 0)));
 
-        // Placer gardien s'il existe
-        const gardien = players.find(p => p["poste préféré"] === "Gardien");
-        if (gardien) {
-          titulaires.push({ ...gardien, poste: "G" });
+      const compo = TACTICS[tactic];
+      const titulaires = [];
+      const remplaçants = [];
+      const posteMap = { Gardien: "G", Défenseur: "D", Milieu: "M", Attaquant: "A" };
+
+      const gardien = actifs.find(p => p["poste préféré"] === "Gardien");
+      if (gardien) {
+        titulaires.push({ ...gardien, poste: "G" });
+      }
+
+      const restants = actifs.filter(p => p.id !== gardien?.id);
+      compo.forEach(pos => {
+        if (pos === "G" && gardien) return;
+        const préférés = restants.find(p => posteMap[p["poste préféré"]] === pos);
+        const acceptés = restants.find(p => String(p[`${pos.toLowerCase()} accepté`]).toLowerCase() === "true");
+        const choisi = préférés || acceptés;
+        if (choisi) {
+          titulaires.push({ ...choisi, poste: pos });
+          const index = restants.findIndex(p => p.id === choisi.id);
+          if (index !== -1) restants.splice(index, 1);
         }
+      });
 
-        const restants = players.filter(p => p.id !== gardien?.id);
-
-        compo.forEach(pos => {
-          if (pos === "G" && gardien) return;
-          const préférés = restants.find(p => posteMap[p["poste préféré"]] === pos);
-          const acceptés = restants.find(p => String(p[`${pos.toLowerCase()} accepté`]).toLowerCase() === "true");
-
-          const choisi = préférés || acceptés;
-          if (choisi) {
-            titulaires.push({ ...choisi, poste: pos });
-            const index = restants.findIndex(p => p.id === choisi.id);
-            if (index !== -1) restants.splice(index, 1);
-          }
-        });
-
-        return { titulaires, remplaçants: restants };
-      };
-
-      const { titulaires, remplaçants } = assignPlayers();
       const posteCount = { G: 0, D: 0, M: 0, A: 0 };
-
       return (
-        <>
-          <div className="terrain">
-            {titulaires.map((p, i) => {
-              const poste = p.poste;
-              const count = posteCount[poste]++;
-              const left = 15 + count * 20;
-              return (
-                <div key={i} className="player" style={{ top: POSITIONS[poste].top + "%", left: left + "%" }}>
-                  {p.nom}
-                </div>
-              );
-            })}
-          </div>
-          <div className="subs">
-            <h3>🔁 Remplaçants</h3>
-            {remplaçants.map(p => (
-              <div key={p.id}>{p.nom} ({p["poste préféré"]})</div>
-            ))}
-          </div>
-        </>
+        <div className="terrain">
+          {titulaires.map((p, i) => {
+            const poste = p.poste;
+            const count = posteCount[poste]++;
+            const left = 20 + count * 15;
+            return (
+              <div key={i} className="player" style={{ top: POSITIONS[poste].top + "%", left: left + "%" }}>
+                {p.nom}
+              </div>
+            );
+          })}
+        </div>
       );
     }
 
     function generate() {
-      const val = document.getElementById("tacticSelect").value;
-      ReactDOM.render(<App key={val} />, document.getElementById("root"));
+      const tactic = document.getElementById("tacticSelect").value;
+      ReactDOM.render(<App tactic={tactic} />, document.getElementById("root"));
     }
 
-    generate();
+    fetch(SHEET_URL)
+      .then(res => res.json())
+      .then(data => {
+        allPlayers = data.map(p => ({ ...p, id: p.id || p.nom }));
+        updatePresenceList(allPlayers, generate);
+        generate();
+      });
   </script>
 </body>
 </html>
