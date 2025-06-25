@@ -3,58 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ESLM – Terrain interactif</title>
+  <title>ESLM – Composition terrain</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
-    body { font-family: Arial; margin: 0; background: #111; color: yellow; }
-    header { display: flex; align-items: center; padding: 10px; background: black; }
-    header img { height: 40px; margin-right: 15px; }
-    h1 { margin: 0; font-size: 1.5em; }
-    .controls { padding: 10px; background: #222; display: flex; align-items: center; gap: 10px; }
-    .terrain { background: url('https://i.postimg.cc/k4jZTVr8/terrain-pro.png') no-repeat center/contain; height: 80vh; position: relative; margin: 10px; border: 3px solid yellow; }
-    .player { position: absolute; padding: 4px 8px; background: black; border: 1px solid yellow; border-radius: 6px; font-size: 12px; text-align: center; }
-    .remplaçants { padding: 10px; background: #222; margin: 10px; border-radius: 6px; }
-    select, button { padding: 5px; font-size: 1em; }
+    body {
+      margin: 0; font-family: Arial; background: #111; color: yellow;
+    }
+    header {
+      display: flex; align-items: center; background: black; padding: 10px;
+    }
+    header img {
+      height: 40px; margin-right: 10px;
+    }
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 10px; background: #222; padding: 10px;
+    }
+    .controls select, .controls button {
+      padding: 5px 10px; font-size: 16px;
+    }
+    .terrain {
+      position: relative;
+      background: url('https://i.postimg.cc/k4jZTVr8/terrain-pro.png') no-repeat center center;
+      background-size: cover;
+      height: 500px;
+      margin: 10px;
+      border: 2px solid yellow;
+    }
+    .player {
+      position: absolute;
+      background: black;
+      color: yellow;
+      border: 1px solid yellow;
+      border-radius: 5px;
+      font-size: 12px;
+      padding: 4px 6px;
+      text-align: center;
+      max-width: 80px;
+      transform: translate(-50%, -50%);
+    }
+    .subs {
+      background: #222; padding: 10px; margin: 10px;
+    }
+    @media (max-width: 600px) {
+      .terrain { height: 300px; }
+      .player { font-size: 10px; }
+    }
   </style>
 </head>
 <body>
   <header>
-    <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="Logo ESLM" />
-    <h1>ESLM – Composition sur terrain</h1>
+    <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="Logo ESLM">
+    <h1>ESLM – Terrain et Compo</h1>
   </header>
+
   <div class="controls">
-    <label for="tactic">Tactique :</label>
-    <select id="tactic">
+    <label>Tactique :</label>
+    <select id="tacticSelect">
       <option value="4-4-2">4-4-2</option>
       <option value="4-3-3">4-3-3</option>
       <option value="3-5-2">3-5-2</option>
     </select>
-    <button onclick="generate()">🎲 Générer les équipes</button>
+    <button onclick="generate()">🎲 Générer</button>
   </div>
-  <div id="root"></div>
+
+  <div id="root">Chargement…</div>
 
   <script type="text/babel">
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec";
-
-    const placements = {
+    const TACTICS = {
       "4-4-2": ["G", "D", "D", "D", "D", "M", "M", "M", "M", "A", "A"],
       "4-3-3": ["G", "D", "D", "D", "D", "M", "M", "M", "A", "A", "A"],
       "3-5-2": ["G", "D", "D", "D", "M", "M", "M", "M", "M", "A", "A"]
     };
 
-    const coordinates = {
-      "G": { top: "85%", lefts: [45] },
-      "D": { top: "65%", lefts: [20, 35, 55, 70] },
-      "M": { top: "45%", lefts: [20, 35, 50, 65, 80] },
-      "A": { top: "25%", lefts: [40, 60] }
+    const POSITIONS = {
+      G: { top: 90 },
+      D: { top: 70 },
+      M: { top: 50 },
+      A: { top: 30 }
     };
+
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec";
 
     function App() {
       const [players, setPlayers] = React.useState([]);
-      const [team, setTeam] = React.useState([]);
-      const [subs, setSubs] = React.useState([]);
       const [tactic, setTactic] = React.useState("4-4-2");
 
       React.useEffect(() => {
@@ -68,50 +101,65 @@
           });
       }, []);
 
-      React.useEffect(() => {
-        generateTeam();
-      }, [players, tactic]);
+      const assignPlayers = () => {
+        const compo = TACTICS[tactic];
+        const titulaires = [];
+        const remplaçants = [];
+        const posteMap = { Gardien: "G", Défenseur: "D", Milieu: "M", Attaquant: "A" };
 
-      function generateTeam() {
-        const config = placements[tactic];
-        const selected = players.slice(0, config.length);
-        const bench = players.slice(config.length);
-        const count = { G: 0, D: 0, M: 0, A: 0 };
+        // Placer gardien s'il existe
+        const gardien = players.find(p => p["poste préféré"] === "Gardien");
+        if (gardien) {
+          titulaires.push({ ...gardien, poste: "G" });
+        }
 
-        const positioned = selected.map((p, i) => {
-          const role = config[i];
-          const left = coordinates[role].lefts[count[role]] || 50;
-          count[role]++;
-          return {
-            ...p,
-            role,
-            pos: { top: coordinates[role].top, left: `${left}%` }
-          };
+        const restants = players.filter(p => p.id !== gardien?.id);
+
+        compo.forEach(pos => {
+          if (pos === "G" && gardien) return;
+          const préférés = restants.find(p => posteMap[p["poste préféré"]] === pos);
+          const acceptés = restants.find(p => String(p[`${pos.toLowerCase()} accepté`]).toLowerCase() === "true");
+
+          const choisi = préférés || acceptés;
+          if (choisi) {
+            titulaires.push({ ...choisi, poste: pos });
+            const index = restants.findIndex(p => p.id === choisi.id);
+            if (index !== -1) restants.splice(index, 1);
+          }
         });
 
-        setTeam(positioned);
-        setSubs(bench);
-      }
+        return { titulaires, remplaçants: restants };
+      };
+
+      const { titulaires, remplaçants } = assignPlayers();
+      const posteCount = { G: 0, D: 0, M: 0, A: 0 };
 
       return (
         <>
           <div className="terrain">
-            {team.map((p, i) => (
-              <div key={i} className="player" style={{ top: p.pos.top, left: p.pos.left }}>
-                {p.nom}
-              </div>
-            ))}
+            {titulaires.map((p, i) => {
+              const poste = p.poste;
+              const count = posteCount[poste]++;
+              const left = 15 + count * 20;
+              return (
+                <div key={i} className="player" style={{ top: POSITIONS[poste].top + "%", left: left + "%" }}>
+                  {p.nom}
+                </div>
+              );
+            })}
           </div>
-          <div className="remplaçants">
+          <div className="subs">
             <h3>🔁 Remplaçants</h3>
-            {subs.map(p => <div key={p.id}>{p.nom} ({p["poste préféré"]})</div>)}
+            {remplaçants.map(p => (
+              <div key={p.id}>{p.nom} ({p["poste préféré"]})</div>
+            ))}
           </div>
         </>
       );
     }
 
     function generate() {
-      const val = document.getElementById("tactic").value;
+      const val = document.getElementById("tacticSelect").value;
       ReactDOM.render(<App key={val} />, document.getElementById("root"));
     }
 
