@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESLM App</title>
+  <title>ESLM App - Équipe Locale</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,55 +11,67 @@
 <body>
   <div id="root">Chargement...</div>
   <script type="text/babel">
-    const { useState, useEffect } = React;
-    const SHEET_API = "/api/save";
+    const { useState } = React;
 
     function App() {
       const [players, setPlayers] = useState([]);
-      const [nom, setNom] = useState("");
+      const [form, setForm] = useState({
+        nom: "",
+        starRating: 3,
+        preferredPosition: "milieu",
+        physical: "normal",
+        present: true
+      });
 
-      useEffect(() => {
-        fetch(SHEET_API)
-          .then(res => res.json())
-          .then(setPlayers)
-          .catch(err => console.error("Erreur de chargement", err));
-      }, []);
+      const handleChange = e => {
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+      };
 
       const addPlayer = () => {
-        if (!nom.trim()) return alert("Nom requis");
-        const newPlayer = {
-          id: Date.now(),
-          nom,
+        if (!form.nom.trim()) return alert("Nom requis");
+        const newPlayer = { ...form, id: Date.now() };
+        setPlayers([...players, newPlayer]);
+        setForm({
+          nom: "",
           starRating: 3,
-          totalPoints: 30,
           preferredPosition: "milieu",
-          acceptedPositions: ["milieu"],
-          footedness: "droitier",
-          speed: "normal",
-          heading: "normal",
-          endurance: "normal",
-          technique: "normal",
-          present: true,
-          activities: {}
-        };
-        fetch(SHEET_API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(newPlayer)
-        })
-        .then(() => {
-          setPlayers([...players, newPlayer]);
-          setNom("");
-        })
-        .catch(err => console.error("Erreur enregistrement", err));
+          physical: "normal",
+          present: true
+        });
       };
 
       return (
-        <div style={{ padding: 20 }}>
-          <h1>Joueurs ESLM</h1>
-          <ul>{players.map(p => <li key={p.id}>{p.nom}</li>)}</ul>
-          <input value={nom} onChange={e => setNom(e.target.value)} placeholder="Nom du joueur" />
-          <button onClick={addPlayer}>Ajouter joueur</button>
+        <div style={{ padding: 20, fontFamily: "Arial" }}>
+          <h1>📋 Joueurs ESLM (stockés localement)</h1>
+          <ul>
+            {players.map(p => (
+              <li key={p.id}>
+                {p.nom} – {p.preferredPosition} – ⭐{p.starRating} – Physique : {p.physical}
+              </li>
+            ))}
+          </ul>
+          <h2>➕ Ajouter un joueur</h2>
+          <input name="nom" value={form.nom} onChange={handleChange} placeholder="Nom" />
+          <select name="preferredPosition" value={form.preferredPosition} onChange={handleChange}>
+            <option value="gardien">Gardien</option>
+            <option value="défenseur">Défenseur</option>
+            <option value="milieu">Milieu</option>
+            <option value="attaquant">Attaquant</option>
+          </select>
+          <select name="starRating" value={form.starRating} onChange={handleChange}>
+            <option value={1}>⭐</option>
+            <option value={2}>⭐⭐</option>
+            <option value={3}>⭐⭐⭐</option>
+            <option value={4}>⭐⭐⭐⭐</option>
+            <option value={5}>⭐⭐⭐⭐⭐</option>
+          </select>
+          <select name="physical" value={form.physical} onChange={handleChange}>
+            <option value="faible">Faible</option>
+            <option value="normal">Normal</option>
+            <option value="fort">Fort</option>
+          </select>
+          <button onClick={addPlayer}>Ajouter</button>
         </div>
       );
     }
