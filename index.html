@@ -1,77 +1,54 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ESLM App - Équipe Locale</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ESLM Dashboard</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { font-family: Arial; margin: 0; background: #f4f4f4; }
+    header { background: black; color: yellow; padding: 10px 20px; display: flex; align-items: center; gap: 15px; }
+    header img { height: 40px; }
+    main { padding: 20px; }
+    .player-card { background: white; border-radius: 10px; padding: 10px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  </style>
 </head>
 <body>
-  <div id="root">Chargement...</div>
+  <header>
+    <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="Logo ESLM" />
+    <h1>Tableau de bord ESLM</h1>
+  </header>
+  <main>
+    <div id="root">Chargement…</div>
+  </main>
+
   <script type="text/babel">
-    const { useState } = React;
+    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec";
 
     function App() {
-      const [players, setPlayers] = useState([]);
-      const [form, setForm] = useState({
-        nom: "",
-        starRating: 3,
-        preferredPosition: "milieu",
-        physical: "normal",
-        present: true
-      });
+      const [players, setPlayers] = React.useState([]);
 
-      const handleChange = e => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-      };
-
-      const addPlayer = () => {
-        if (!form.nom.trim()) return alert("Nom requis");
-        const newPlayer = { ...form, id: Date.now() };
-        setPlayers([...players, newPlayer]);
-        setForm({
-          nom: "",
-          starRating: 3,
-          preferredPosition: "milieu",
-          physical: "normal",
-          present: true
-        });
-      };
+      React.useEffect(() => {
+        fetch(GOOGLE_SHEET_URL)
+          .then(res => res.json())
+          .then(data => setPlayers(data))
+          .catch(err => console.error("Erreur chargement", err));
+      }, []);
 
       return (
-        <div style={{ padding: 20, fontFamily: "Arial" }}>
-          <h1>📋 Joueurs ESLM (stockés localement)</h1>
-          <ul>
+        <div>
+          <h2>📋 Joueurs enregistrés</h2>
+          <div>
             {players.map(p => (
-              <li key={p.id}>
-                {p.nom} – {p.preferredPosition} – ⭐{p.starRating} – Physique : {p.physical}
-              </li>
+              <div key={p.id} className="player-card">
+                <strong>{p.nom}</strong><br/>
+                Poste : {p.preferredPosition}<br/>
+                ⭐ {p.starRating} – Physique : {p.physical} – Présent : {String(p.present)}
+              </div>
             ))}
-          </ul>
-          <h2>➕ Ajouter un joueur</h2>
-          <input name="nom" value={form.nom} onChange={handleChange} placeholder="Nom" />
-          <select name="preferredPosition" value={form.preferredPosition} onChange={handleChange}>
-            <option value="gardien">Gardien</option>
-            <option value="défenseur">Défenseur</option>
-            <option value="milieu">Milieu</option>
-            <option value="attaquant">Attaquant</option>
-          </select>
-          <select name="starRating" value={form.starRating} onChange={handleChange}>
-            <option value={1}>⭐</option>
-            <option value={2}>⭐⭐</option>
-            <option value={3}>⭐⭐⭐</option>
-            <option value={4}>⭐⭐⭐⭐</option>
-            <option value={5}>⭐⭐⭐⭐⭐</option>
-          </select>
-          <select name="physical" value={form.physical} onChange={handleChange}>
-            <option value="faible">Faible</option>
-            <option value="normal">Normal</option>
-            <option value="fort">Fort</option>
-          </select>
-          <button onClick={addPlayer}>Ajouter</button>
+          </div>
         </div>
       );
     }
