@@ -1,183 +1,564 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ESLM – Composition terrain</title>
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    body {
-      margin: 0; font-family: Arial; background: #111; color: yellow;
-    }
-    header {
-      display: flex; align-items: center; background: black; padding: 10px;
-    }
-    header img {
-      height: 40px; margin-right: 10px;
-    }
-    .controls {
-      display: flex; flex-wrap: wrap; gap: 10px; background: #222; padding: 10px;
-    }
-    .controls select, .controls button {
-      padding: 5px 10px; font-size: 16px;
-    }
-    .container {
-      display: flex; flex-wrap: wrap;
-    }
-    .player-list {
-      flex: 1; min-width: 280px; background: #222; padding: 10px;
-    }
-    .player-list label {
-      display: flex; justify-content: space-between; padding: 3px 0;
-    }
-    .terrain {
-      flex: 2;
-      position: relative;
-      background: url('https://i.postimg.cc/k4jZTVr8/terrain-pro.png') no-repeat center center;
-      background-size: cover;
-      height: 500px;
-      margin: 10px;
-      border: 2px solid yellow;
-    }
-    .player {
-      position: absolute;
-      background: black;
-      color: yellow;
-      border: 1px solid yellow;
-      border-radius: 5px;
-      font-size: 12px;
-      padding: 4px 6px;
-      text-align: center;
-      max-width: 80px;
-      transform: translate(-50%, -50%);
-    }
-    .subs {
-      background: #222; padding: 10px; margin: 10px;
-    }
-    @media (max-width: 600px) {
-      .terrain { height: 300px; }
-      .player { font-size: 10px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESLM Générator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a73e8;
+            --secondary: #34a853;
+            --danger: #ea4335;
+            --warning: #fbbc05;
+            --dark: #202124;
+            --light: #f8f9fa;
+            --gray: #dadce0;
+            --border-radius: 12px;
+            --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: #5f6368;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            transition: var(--transition);
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray);
+        }
+
+        .panel-header h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: #0d62d0;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+        }
+
+        .btn-success:hover {
+            background: #2a8a46;
+            box-shadow: 0 5px 15px rgba(52, 168, 83, 0.3);
+        }
+
+        .players-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .player-card {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8fbff;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: var(--transition);
+            border: 1px solid #e3f2fd;
+        }
+
+        .player-card:hover {
+            background: #e3f2fd;
+            transform: translateX(5px);
+        }
+
+        .player-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .player-info {
+            flex-grow: 1;
+        }
+
+        .player-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .player-details {
+            display: flex;
+            gap: 15px;
+            color: #5f6368;
+            font-size: 0.9rem;
+        }
+
+        .player-detail {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-level {
+            background: #e8f0fe;
+            color: var(--primary);
+        }
+
+        .badge-position {
+            background: #e6f4ea;
+            color: var(--secondary);
+        }
+
+        .badge-foot {
+            background: #fce8e6;
+            color: var(--danger);
+        }
+
+        .teams-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .team-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .team-header {
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .team-1 .team-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #0d62d0 100%);
+        }
+
+        .team-2 .team-header {
+            background: linear-gradient(135deg, var(--secondary) 0%, #2a8a46 100%);
+        }
+
+        .team-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-stats {
+            text-align: right;
+        }
+
+        .team-stats div {
+            margin-bottom: 5px;
+        }
+
+        .team-players {
+            padding: 20px;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .player-row:last-child {
+            border-bottom: none;
+        }
+
+        .player-row .player-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .player-row .player-info {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .player-row .player-name {
+            margin-bottom: 0;
+        }
+
+        .player-row .player-details {
+            display: flex;
+            gap: 8px;
+        }
+
+        .player-row .player-detail {
+            font-size: 0.85rem;
+        }
+
+        .player-row .badge {
+            padding: 3px 8px;
+        }
+
+        .no-players {
+            text-align: center;
+            padding: 40px 0;
+            color: #5f6368;
+            font-style: italic;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(26, 115, 232, 0.2);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            box-shadow: var(--box-shadow);
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--secondary);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: #5f6368;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--gray);
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .teams-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="Logo ESLM">
-    <h1>ESLM – Terrain et Compo</h1>
-  </header>
-
-  <div class="controls">
-    <label>Tactique :</label>
-    <select id="tacticSelect">
-      <option value="4-4-2">4-4-2</option>
-      <option value="4-3-3">4-3-3</option>
-      <option value="3-5-2">3-5-2</option>
-    </select>
-    <button onclick="generate()">🎲 Générer</button>
-  </div>
-
-  <div class="container">
-    <div class="player-list" id="presence-list">Chargement des joueurs...</div>
-    <div id="root">Chargement terrain…</div>
-  </div>
-
-  <script type="text/babel">
-    const TACTICS = {
-      "4-4-2": ["G", "D", "D", "D", "D", "M", "M", "M", "M", "A", "A"],
-      "4-3-3": ["G", "D", "D", "D", "D", "M", "M", "M", "A", "A", "A"],
-      "3-5-2": ["G", "D", "D", "D", "M", "M", "M", "M", "M", "A", "A"]
-    };
-
-    const POSITIONS = {
-      G: { top: 90 },
-      D: { top: 70 },
-      M: { top: 50 },
-      A: { top: 30 }
-    };
-
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzUsOxxiz8ePK1kKOaR2rh3LxzIjdtRvIy1wwIe-NGnjsBp7m2HQxbedWUC8m8ss7pl0A/exec";
-
-    let allPlayers = [];
-    let presenceState = {};
-
-    function updatePresenceList(players, callback) {
-      const container = document.getElementById("presence-list");
-      container.innerHTML = "";
-      players.forEach(p => {
-        const row = document.createElement("label");
-        row.innerHTML = `<span>${p.nom}</span>`;
-        const box = document.createElement("input");
-        box.type = "checkbox";
-        box.checked = String(p["présent"]).toLowerCase() === "true";
-        presenceState[p.id] = box.checked;
-        box.onchange = () => {
-          presenceState[p.id] = box.checked;
-          callback();
-        };
-        row.appendChild(box);
-        container.appendChild(row);
-      });
-    }
-
-    function App({ tactic }) {
-      const actifs = allPlayers
-        .filter(p => presenceState[p.id])
-        .sort((a, b) => (parseInt(b.points || 0) - parseInt(a.points || 0)));
-
-      const compo = TACTICS[tactic];
-      const titulaires = [];
-      const remplaçants = [];
-      const posteMap = { Gardien: "G", Défenseur: "D", Milieu: "M", Attaquant: "A" };
-
-      const gardien = actifs.find(p => p["poste préféré"] === "Gardien");
-      if (gardien) {
-        titulaires.push({ ...gardien, poste: "G" });
-      }
-
-      const restants = actifs.filter(p => p.id !== gardien?.id);
-      compo.forEach(pos => {
-        if (pos === "G" && gardien) return;
-        const préférés = restants.find(p => posteMap[p["poste préféré"]] === pos);
-        const acceptés = restants.find(p => String(p[`${pos.toLowerCase()} accepté`]).toLowerCase() === "true");
-        const choisi = préférés || acceptés;
-        if (choisi) {
-          titulaires.push({ ...choisi, poste: pos });
-          const index = restants.findIndex(p => p.id === choisi.id);
-          if (index !== -1) restants.splice(index, 1);
-        }
-      });
-
-      const posteCount = { G: 0, D: 0, M: 0, A: 0 };
-      return (
-        <div className="terrain">
-          {titulaires.map((p, i) => {
-            const poste = p.poste;
-            const count = posteCount[poste]++;
-            const left = 20 + count * 15;
-            return (
-              <div key={i} className="player" style={{ top: POSITIONS[poste].top + "%", left: left + "%" }}>
-                {p.nom}
-              </div>
-            );
-          })}
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-futbol"></i> Générateur d'Équipes de Football</h1>
+            <p>Créez des équipes équilibrées à partir de votre base de données Google Sheets</p>
+        </header>
+        
+        <div class="app-container">
+            <!-- Panneau de contrôle -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-cog"></i> Configuration</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="numTeams">Nombre d'équipes</label>
+                    <select id="numTeams">
+                        <option value="1">1 Équipe (Entraînement)</option>
+                        <option value="2" selected>2 Équipes</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="teamSize">Taille maximale par équipe</label>
+                    <input type="number" id="teamSize" min="5" max="15" value="11">
+                </div>
+                
+                <div class="checkbox-container">
+                    <label class="switch">
+                        <input type="checkbox" id="balanceLevel" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Équilibrer par niveau</span>
+                </div>
+                
+                <div class="checkbox-container">
+                    <label class="switch">
+                        <input type="checkbox" id="balancePosition" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Équilibrer par poste</span>
+                </div>
+                
+                <button id="generateBtn" class="btn">
+                    <i class="fas fa-magic"></i> Générer les équipes
+                </button>
+                
+                <button id="refreshBtn" class="btn btn-success">
+                    <i class="fas fa-sync-alt"></i> Actualiser les données
+                </button>
+            </div>
+            
+            <!-- Liste des joueurs -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h2><i class="fas fa-users"></i> Joueurs Disponibles</h2>
+                    <span id="playerCount">0 joueurs</span>
+                </div>
+                
+                <div class="players-list" id="playersList">
+                    <!-- Les joueurs seront chargés ici -->
+                </div>
+            </div>
         </div>
-      );
-    }
-
-    function generate() {
-      const tactic = document.getElementById("tacticSelect").value;
-      ReactDOM.render(<App tactic={tactic} />, document.getElementById("root"));
-    }
-
-    fetch(SHEET_URL)
-      .then(res => res.json())
-      .then(data => {
-        allPlayers = data.map(p => ({ ...p, id: p.id || p.nom }));
-        updatePresenceList(allPlayers, generate);
-        generate();
-      });
-  </script>
-</body>
-</html>
+        
+        <!-- Résultats des équipes -->
+        <div class="panel" style="margin-top: 30px; display: none;" id="resultsPanel">
+            <div class="panel-header">
+                <h2><i class="fas fa-trophy"></i> Équipes Générées</h2>
+            </div>
+            
+            <div class="teams-container" id="teamsContainer">
+                <!-- Les équipes seront générées ici -->
+            </div>
+        </div>
+        
+        <footer>
+            <p>Application professionnelle de composition d'équipes de football | &copy; 2023</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Données de démonstration
+        const demoPlayers = [
+            { id: 1, firstName: "Lionel", lastName: "Messi", level: 9.8, position: "Attaquant", strongFoot: "Gauche", availability: true },
+            { id: 2, firstName: "Kylian", lastName: "Mbappé", level: 9.5, position: "Attaquant", strongFoot: "Droit", availability: true },
+            { id: 3, firstName: "Kevin", lastName: "De Bruyne", level: 9.3, position: "Milieu", strongFoot: "Droit", availability: true },
+            { id: 4, firstName: "Virgil", lastName: "van Dijk", level: 9.0, position: "Défenseur", strongFoot: "Droit", availability: true },
+            { id: 5, firstName: "Thibaut", lastName: "Courtois", level: 9.1, position: "Gardien", strongFoot: "Gauche", availability: true },
+            { id: 6, firstName: "Karim", lastName: "Benzema", level: 9.2, position: "Attaquant", strongFoot: "Droit", availability: true },
+            { id: 7, firstName: "Erling", lastName: "Haaland", level: 9.4, position: "Attaquant", strongFoot: "Droit", availability: true },
+            { id: 8, firstName:
