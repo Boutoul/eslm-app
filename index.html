@@ -552,13 +552,143 @@
     <div class="notification" id="notification"></div>
     
     <script>
-        // Données de démonstration
-        const demoPlayers = [
-            { id: 1, firstName: "Lionel", lastName: "Messi", level: 9.8, position: "Attaquant", strongFoot: "Gauche", availability: true },
-            { id: 2, firstName: "Kylian", lastName: "Mbappé", level: 9.5, position: "Attaquant", strongFoot: "Droit", availability: true },
-            { id: 3, firstName: "Kevin", lastName: "De Bruyne", level: 9.3, position: "Milieu", strongFoot: "Droit", availability: true },
-            { id: 4, firstName: "Virgil", lastName: "van Dijk", level: 9.0, position: "Défenseur", strongFoot: "Droit", availability: true },
-            { id: 5, firstName: "Thibaut", lastName: "Courtois", level: 9.1, position: "Gardien", strongFoot: "Gauche", availability: true },
-            { id: 6, firstName: "Karim", lastName: "Benzema", level: 9.2, position: "Attaquant", strongFoot: "Droit", availability: true },
-            { id: 7, firstName: "Erling", lastName: "Haaland", level: 9.4, position: "Attaquant", strongFoot: "Droit", availability: true },
-            { id: 8, firstName:
+  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz-cluPQnWphcfvEhB7QSllsy-6lkJJ3Bcs0XjZ53urGjprl2VXQd5YGW1A23MBaz2hoQ/exec";
+
+  let allPlayers = [];
+
+  async function loadPlayers() {
+    const res = await fetch(SHEET_URL);
+    const data = await res.json();
+    allPlayers = data.filter(p => String(p["présent"]).toLowerCase() === "true");
+    renderPlayers(allPlayers);
+  }
+
+  function renderPlayers(players) {
+    const container = document.getElementById("playersList");
+    document.getElementById("playerCount").textContent = `${players.length} joueurs`;
+    container.innerHTML = "";
+
+    players.forEach(p => {
+      const div = document.createElement("div");
+      div.className = "player-card";
+
+      const avatar = document.createElement("div");
+      avatar.className = "player-avatar";
+      avatar.textContent = (p.nom || "?").slice(0, 2).toUpperCase();
+
+      const info = document.createElement("div");
+      info.className = "player-info";
+
+      const name = document.createElement("div");
+      name.className = "player-name";
+      name.textContent = p.nom;
+
+      const details = document.createElement("div");
+      details.className = "player-details";
+
+      const badgeLevel = `<div class="badge badge-level">${p.étoiles || p.points || "?"} ⭐</div>`;
+      const badgePosition = `<div class="badge badge-position">${p["poste préféré"] || "?"}</div>`;
+      const badgeFoot = `<div class="badge badge-foot">${p.pied || "?"}</div>`;
+
+      details.innerHTML = badgeLevel + badgePosition + badgeFoot;
+
+      info.appendChild(name);
+      info.appendChild(details);
+      div.appendChild(avatar);
+      div.appendChild(info);
+      container.appendChild(div);
+    });
+  }
+
+  function generateTeams() {
+    const numTeams = parseInt(document.getElementById("numTeams").value);
+    const maxPerTeam = parseInt(document.getElementById("teamSize").value);
+    const balanceByLevel = document.getElementById("balanceLevel").checked;
+    const balanceByPosition = document.getElementById("balancePosition").checked;
+
+    const players = [...allPlayers];
+    if (balanceByLevel) {
+      players.sort((a, b) => (parseInt(b.étoiles || b.points || 0) - parseInt(a.étoiles || a.points || 0)));
+    }
+
+    const teams = Array.from({ length: numTeams }, () => []);
+
+    // Répartition équilibrée
+    let teamIndex = 0;
+    while (players.length) {
+      const p = players.shift();
+      if (teams[teamIndex].length < maxPerTeam) {
+        teams[teamIndex].push(p);
+        teamIndex = (teamIndex + 1) % numTeams;
+      } else {
+        teamIndex = (teamIndex + 1) % numTeams;
+        players.push(p); // Repasser en boucle si équipe pleine
+      }
+    }
+
+    renderTeams(teams);
+  }
+
+  function renderTeams(teams) {
+    const container = document.getElementById("teamsContainer");
+    const panel = document.getElementById("resultsPanel");
+    panel.style.display = "block";
+    container.innerHTML = "";
+
+    teams.forEach((team, i) => {
+      const teamDiv = document.createElement("div");
+      teamDiv.className = `team-card team-${i + 1}`;
+
+      const header = document.createElement("div");
+      header.className = "team-header";
+      header.innerHTML = `
+        <div class="team-title"><i class="fas fa-shield-alt"></i> Équipe ${String.fromCharCode(65 + i)}</div>
+        <div class="team-stats"><div>${team.length} joueurs</div></div>
+      `;
+
+      const body = document.createElement("div");
+      body.className = "team-players";
+
+      team.forEach(p => {
+        const row = document.createElement("div");
+        row.className = "player-row";
+
+        const avatar = document.createElement("div");
+        avatar.className = "player-avatar";
+        avatar.textContent = (p.nom || "?").slice(0, 2).toUpperCase();
+
+        const info = document.createElement("div");
+        info.className = "player-info";
+
+        const name = document.createElement("div");
+        name.className = "player-name";
+        name.textContent = p.nom;
+
+        const details = document.createElement("div");
+        details.className = "player-details";
+        details.innerHTML = `
+          <div class="badge badge-level">${p.étoiles || p.points || "?"} ⭐</div>
+          <div class="badge badge-position">${p["poste préféré"] || "?"}</div>
+          <div class="badge badge-foot">${p.pied || "?"}</div>
+        `;
+
+        info.appendChild(name);
+        info.appendChild(details);
+        row.appendChild(avatar);
+        row.appendChild(info);
+        body.appendChild(row);
+      });
+
+      teamDiv.appendChild(header);
+      teamDiv.appendChild(body);
+      container.appendChild(teamDiv);
+    });
+  }
+
+  // Événements
+  document.getElementById("refreshBtn").addEventListener("click", loadPlayers);
+  document.getElementById("generateBtn").addEventListener("click", generateTeams);
+
+  // Initialisation
+  loadPlayers();
+</script>
