@@ -1,694 +1,123 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESLM Générator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #1a73e8;
-            --secondary: #34a853;
-            --danger: #ea4335;
-            --warning: #fbbc05;
-            --dark: #202124;
-            --light: #f8f9fa;
-            --gray: #dadce0;
-            --border-radius: 12px;
-            --box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            color: var(--dark);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 30px 0;
-            margin-bottom: 30px;
-        }
-
-        header h1 {
-            font-size: 2.8rem;
-            color: var(--primary);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        header p {
-            font-size: 1.2rem;
-            color: #5f6368;
-            max-width: 700px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .app-container {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 25px;
-        }
-
-        .panel {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 25px;
-            transition: var(--transition);
-        }
-
-        .panel:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .panel-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--gray);
-        }
-
-        .panel-header h2 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        select, input[type="number"] {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--gray);
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: var(--transition);
-        }
-
-        select:focus, input[type="number"]:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: var(--transition);
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: var(--transition);
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(30px);
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
-
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            font-family: inherit;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn:hover {
-            background: #0d62d0;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
-        }
-
-        .btn-success {
-            background: var(--secondary);
-        }
-
-        .btn-success:hover {
-            background: #2a8a46;
-            box-shadow: 0 5px 15px rgba(52, 168, 83, 0.3);
-        }
-
-        .players-list {
-            max-height: 400px;
-            overflow-y: auto;
-            padding-right: 10px;
-        }
-
-        .player-card {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            background: #f8fbff;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: var(--transition);
-            border: 1px solid #e3f2fd;
-        }
-
-        .player-card:hover {
-            background: #e3f2fd;
-            transform: translateX(5px);
-        }
-
-        .player-avatar {
-            width: 45px;
-            height: 45px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .player-info {
-            flex-grow: 1;
-        }
-
-        .player-name {
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-
-        .player-details {
-            display: flex;
-            gap: 15px;
-            color: #5f6368;
-            font-size: 0.9rem;
-        }
-
-        .player-detail {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .badge-level {
-            background: #e8f0fe;
-            color: var(--primary);
-        }
-
-        .badge-position {
-            background: #e6f4ea;
-            color: var(--secondary);
-        }
-
-        .badge-foot {
-            background: #fce8e6;
-            color: var(--danger);
-        }
-
-        .teams-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-        }
-
-        .team-card {
-            background: white;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--box-shadow);
-            transition: var(--transition);
-        }
-
-        .team-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .team-header {
-            padding: 20px;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .team-1 .team-header {
-            background: linear-gradient(135deg, var(--primary) 0%, #0d62d0 100%);
-        }
-
-        .team-2 .team-header {
-            background: linear-gradient(135deg, var(--secondary) 0%, #2a8a46 100%);
-        }
-
-        .team-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .team-stats {
-            text-align: right;
-        }
-
-        .team-stats div {
-            margin-bottom: 5px;
-        }
-
-        .team-players {
-            padding: 20px;
-        }
-
-        .player-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--gray);
-        }
-
-        .player-row:last-child {
-            border-bottom: none;
-        }
-
-        .player-row .player-avatar {
-            width: 40px;
-            height: 40px;
-            font-size: 1rem;
-        }
-
-        .player-row .player-info {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .player-row .player-name {
-            margin-bottom: 0;
-        }
-
-        .player-row .player-details {
-            display: flex;
-            gap: 8px;
-        }
-
-        .player-row .player-detail {
-            font-size: 0.85rem;
-        }
-
-        .player-row .badge {
-            padding: 3px 8px;
-        }
-
-        .no-players {
-            text-align: center;
-            padding: 40px 0;
-            color: #5f6368;
-            font-style: italic;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            padding: 30px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(26, 115, 232, 0.2);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            box-shadow: var(--box-shadow);
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-            z-index: 1000;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.success {
-            background: var(--secondary);
-        }
-
-        .notification.error {
-            background: var(--danger);
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px 0;
-            margin-top: 50px;
-            color: #5f6368;
-            font-size: 0.9rem;
-            border-top: 1px solid var(--gray);
-        }
-
-        @media (max-width: 1024px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .teams-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ESLM – Générateur d'Équipes</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; font-family: 'Arial', sans-serif; background: #121212; color: #f0c300; }
+    header { background: black; padding: 10px 20px; display: flex; align-items: center; gap: 15px; }
+    header img { height: 40px; }
+    header h1 { font-size: 1.5rem; margin: 0; }
+    main { padding: 20px; }
+    .player-card { display: flex; justify-content: space-between; align-items: center; background: #1e1e1e; padding: 10px; margin-bottom: 8px; border-radius: 6px; }
+    .teams { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+    .team { flex: 1; min-width: 280px; background: #1e1e1e; border-radius: 6px; padding: 10px; }
+    .team h2 { text-align: center; color: #f0c300; }
+    .team .player { padding: 4px 0; border-bottom: 1px solid #333; }
+    button { background: #f0c300; border: none; color: black; padding: 10px 15px; font-weight: bold; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+    button:hover { background: #ffe600; }
+    input[type=checkbox] { transform: scale(1.2); }
+    @media (max-width: 600px) {
+      .teams { flex-direction: column; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-futbol"></i> Générateur d'Équipes de Football</h1>
-            <p>Créez des équipes équilibrées à partir de votre base de données Google Sheets</p>
-        </header>
-        
-        <div class="app-container">
-            <!-- Panneau de contrôle -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h2><i class="fas fa-cog"></i> Configuration</h2>
-                </div>
-                
-                <div class="form-group">
-                    <label for="numTeams">Nombre d'équipes</label>
-                    <select id="numTeams">
-                        <option value="1">1 Équipe (Entraînement)</option>
-                        <option value="2" selected>2 Équipes</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="teamSize">Taille maximale par équipe</label>
-                    <input type="number" id="teamSize" min="5" max="15" value="11">
-                </div>
-                
-                <div class="checkbox-container">
-                    <label class="switch">
-                        <input type="checkbox" id="balanceLevel" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span>Équilibrer par niveau</span>
-                </div>
-                
-                <div class="checkbox-container">
-                    <label class="switch">
-                        <input type="checkbox" id="balancePosition" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span>Équilibrer par poste</span>
-                </div>
-                
-                <button id="generateBtn" class="btn">
-                    <i class="fas fa-magic"></i> Générer les équipes
-                </button>
-                
-                <button id="refreshBtn" class="btn btn-success">
-                    <i class="fas fa-sync-alt"></i> Actualiser les données
-                </button>
-            </div>
-            
-            <!-- Liste des joueurs -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h2><i class="fas fa-users"></i> Joueurs Disponibles</h2>
-                    <span id="playerCount">0 joueurs</span>
-                </div>
-                
-                <div class="players-list" id="playersList">
-                    <!-- Les joueurs seront chargés ici -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Résultats des équipes -->
-        <div class="panel" style="margin-top: 30px; display: none;" id="resultsPanel">
-            <div class="panel-header">
-                <h2><i class="fas fa-trophy"></i> Équipes Générées</h2>
-            </div>
-            
-            <div class="teams-container" id="teamsContainer">
-                <!-- Les équipes seront générées ici -->
-            </div>
-        </div>
-        
-        <footer>
-            <p>Application professionnelle de composition d'équipes de football | &copy; 2023</p>
-        </footer>
-    </div>
-    
-    <div class="notification" id="notification"></div>
-    
-    <script>
-  const SHEET_URL = "https://script.google.com/macros/s/AKfycbz-cluPQnWphcfvEhB7QSllsy-6lkJJ3Bcs0XjZ53urGjprl2VXQd5YGW1A23MBaz2hoQ/exec";
+  <header>
+    <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="ESLM Logo">
+    <h1>Générateur d'Équipes ESLM</h1>
+  </header>
+  <main>
+    <button onclick="generateTeams()">🎲 Composer les équipes</button>
+    <div id="players"></div>
+    <div class="teams" id="teams"></div>
+  </main>
 
-  let allPlayers = [];
+  <script type="text/babel">
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbz-cluPQnWphcfvEhB7QSllsy-6lkJJ3Bcs0XjZ53urGjprl2VXQd5YGW1A23MBaz2hoQ/exec";
 
-  async function loadPlayers() {
-    const res = await fetch(SHEET_URL);
-    const data = await res.json();
-    allPlayers = data.filter(p => String(p["présent"]).toLowerCase() === "true");
-    renderPlayers(allPlayers);
-  }
+    let allPlayers = [];
 
-  function renderPlayers(players) {
-    const container = document.getElementById("playersList");
-    document.getElementById("playerCount").textContent = `${players.length} joueurs`;
-    container.innerHTML = "";
+    function App() {
+      const [players, setPlayers] = React.useState([]);
+      const [active, setActive] = React.useState({});
+      const [teams, setTeams] = React.useState([[], []]);
 
-    players.forEach(p => {
-      const div = document.createElement("div");
-      div.className = "player-card";
+      React.useEffect(() => {
+        fetch(SHEET_URL)
+          .then(res => res.json())
+          .then(data => {
+            const filtered = data.map(p => ({ ...p, id: p.id || p.nom }));
+            const presenceMap = {};
+            filtered.forEach(p => {
+              presenceMap[p.id] = String(p["présent"]).toLowerCase() === "true";
+            });
+            setPlayers(filtered);
+            setActive(presenceMap);
+          });
+      }, []);
 
-      const avatar = document.createElement("div");
-      avatar.className = "player-avatar";
-      avatar.textContent = (p.nom || "?").slice(0, 2).toUpperCase();
-
-      const info = document.createElement("div");
-      info.className = "player-info";
-
-      const name = document.createElement("div");
-      name.className = "player-name";
-      name.textContent = p.nom;
-
-      const details = document.createElement("div");
-      details.className = "player-details";
-
-      const badgeLevel = `<div class="badge badge-level">${p.étoiles || p.points || "?"} ⭐</div>`;
-      const badgePosition = `<div class="badge badge-position">${p["poste préféré"] || "?"}</div>`;
-      const badgeFoot = `<div class="badge badge-foot">${p.pied || "?"}</div>`;
-
-      details.innerHTML = badgeLevel + badgePosition + badgeFoot;
-
-      info.appendChild(name);
-      info.appendChild(details);
-      div.appendChild(avatar);
-      div.appendChild(info);
-      container.appendChild(div);
-    });
-  }
-
-  function generateTeams() {
-    const numTeams = parseInt(document.getElementById("numTeams").value);
-    const maxPerTeam = parseInt(document.getElementById("teamSize").value);
-    const balanceByLevel = document.getElementById("balanceLevel").checked;
-    const balanceByPosition = document.getElementById("balancePosition").checked;
-
-    const players = [...allPlayers];
-    if (balanceByLevel) {
-      players.sort((a, b) => (parseInt(b.étoiles || b.points || 0) - parseInt(a.étoiles || a.points || 0)));
-    }
-
-    const teams = Array.from({ length: numTeams }, () => []);
-
-    // Répartition équilibrée
-    let teamIndex = 0;
-    while (players.length) {
-      const p = players.shift();
-      if (teams[teamIndex].length < maxPerTeam) {
-        teams[teamIndex].push(p);
-        teamIndex = (teamIndex + 1) % numTeams;
-      } else {
-        teamIndex = (teamIndex + 1) % numTeams;
-        players.push(p); // Repasser en boucle si équipe pleine
+      function togglePresence(id) {
+        const updated = { ...active, [id]: !active[id] };
+        setActive(updated);
       }
+
+      function generate() {
+        const présents = players.filter(p => active[p.id]);
+        const triés = présents.sort((a, b) => (parseInt(b.points || 0) - parseInt(a.points || 0)));
+        const teamA = [], teamB = [];
+        let scoreA = 0, scoreB = 0;
+
+        triés.forEach(p => {
+          if (scoreA <= scoreB) {
+            teamA.push(p);
+            scoreA += parseInt(p.points || 0);
+          } else {
+            teamB.push(p);
+            scoreB += parseInt(p.points || 0);
+          }
+        });
+        setTeams([teamA, teamB]);
+      }
+
+      window.generateTeams = generate;
+
+      return (
+        <>
+          <h2>📋 Liste des joueurs</h2>
+          {players.map(p => (
+            <div key={p.id} className="player-card">
+              <div>
+                <strong>{p.nom}</strong> – {p["poste préféré"]} – {p.points || "?"} pts
+              </div>
+              <label>
+                Présent <input type="checkbox" checked={active[p.id] || false} onChange={() => togglePresence(p.id)} />
+              </label>
+            </div>
+          ))}
+          <div className="teams">
+            <div className="team">
+              <h2>🟡 Équipe A</h2>
+              {teams[0].map(p => (
+                <div key={p.id} className="player">{p.nom} – {p["poste préféré"]}</div>
+              ))}
+            </div>
+            <div className="team">
+              <h2>⚫ Équipe B</h2>
+              {teams[1].map(p => (
+                <div key={p.id} className="player">{p.nom} – {p["poste préféré"]}</div>
+              ))}
+            </div>
+          </div>
+        </>
+      );
     }
 
-    renderTeams(teams);
-  }
-
-  function renderTeams(teams) {
-    const container = document.getElementById("teamsContainer");
-    const panel = document.getElementById("resultsPanel");
-    panel.style.display = "block";
-    container.innerHTML = "";
-
-    teams.forEach((team, i) => {
-      const teamDiv = document.createElement("div");
-      teamDiv.className = `team-card team-${i + 1}`;
-
-      const header = document.createElement("div");
-      header.className = "team-header";
-      header.innerHTML = `
-        <div class="team-title"><i class="fas fa-shield-alt"></i> Équipe ${String.fromCharCode(65 + i)}</div>
-        <div class="team-stats"><div>${team.length} joueurs</div></div>
-      `;
-
-      const body = document.createElement("div");
-      body.className = "team-players";
-
-      team.forEach(p => {
-        const row = document.createElement("div");
-        row.className = "player-row";
-
-        const avatar = document.createElement("div");
-        avatar.className = "player-avatar";
-        avatar.textContent = (p.nom || "?").slice(0, 2).toUpperCase();
-
-        const info = document.createElement("div");
-        info.className = "player-info";
-
-        const name = document.createElement("div");
-        name.className = "player-name";
-        name.textContent = p.nom;
-
-        const details = document.createElement("div");
-        details.className = "player-details";
-        details.innerHTML = `
-          <div class="badge badge-level">${p.étoiles || p.points || "?"} ⭐</div>
-          <div class="badge badge-position">${p["poste préféré"] || "?"}</div>
-          <div class="badge badge-foot">${p.pied || "?"}</div>
-        `;
-
-        info.appendChild(name);
-        info.appendChild(details);
-        row.appendChild(avatar);
-        row.appendChild(info);
-        body.appendChild(row);
-      });
-
-      teamDiv.appendChild(header);
-      teamDiv.appendChild(body);
-      container.appendChild(teamDiv);
-    });
-  }
-
-  // Événements
-  document.getElementById("refreshBtn").addEventListener("click", loadPlayers);
-  document.getElementById("generateBtn").addEventListener("click", generateTeams);
-
-  // Initialisation
-  loadPlayers();
-</script>
+    ReactDOM.render(<App />, document.getElementById("players"));
+  </script>
+</body>
+</html>
