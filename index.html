@@ -22,7 +22,7 @@
       justify-content: space-between;
     }
     header img { 
-      height: 70px; /* Logo agrandi */
+      height: 70px;
     }
     header h1 { 
       font-size: 1.8rem; 
@@ -232,6 +232,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       background-size: cover;
+      flex-direction: column;
     }
     
     .player-marker:hover {
@@ -256,6 +257,42 @@
       border: 3px solid #ff0000;
     }
     
+    .substitutes {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .sub-player {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      padding: 2px;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-direction: column;
+    }
+    
+    .sub-player.team-a {
+      background: linear-gradient(145deg, #ffd700, #f0c300);
+      color: #000;
+      border: 2px solid #d4af37;
+    }
+    
+    .sub-player.team-b {
+      background: linear-gradient(145deg, #333, #000);
+      color: #fff;
+      border: 2px solid #444;
+    }
+    
     .team-title {
       text-align: center;
       font-size: 1.5rem;
@@ -271,6 +308,34 @@
     .team-title .badge {
       font-size: 1rem;
       padding: 5px 12px;
+    }
+    
+    .formation-selector {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    
+    .formation-btn {
+      background: #2a2a2a;
+      color: #f0c300;
+      border: 2px solid #f0c300;
+      border-radius: 6px;
+      padding: 8px 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .formation-btn.active {
+      background: #f0c300;
+      color: #000;
+    }
+    
+    .formation-btn:hover {
+      background: #3a3a3a;
     }
     
     /* Responsive design */
@@ -302,6 +367,12 @@
       header h1 {
         margin: 10px 0;
       }
+      
+      .sub-player {
+        width: 40px;
+        height: 40px;
+        font-size: 8px;
+      }
     }
     
     @media (max-width: 480px) {
@@ -317,6 +388,12 @@
       
       .team-title {
         font-size: 1.2rem;
+      }
+      
+      .sub-player {
+        width: 35px;
+        height: 35px;
+        font-size: 7px;
       }
     }
     
@@ -351,6 +428,14 @@
         <label for="teamSize">Taille max. par équipe</label>
         <input type="number" id="teamSize" value="11" min="5" max="15" />
       </div>
+      <div class="form-group">
+        <label>Tactique</label>
+        <div class="formation-selector">
+          <div class="formation-btn active" data-formation="4-4-2">4-4-2</div>
+          <div class="formation-btn" data-formation="3-5-2">3-5-2</div>
+          <div class="formation-btn" data-formation="4-3-3">4-3-3</div>
+        </div>
+      </div>
       <button class="btn" onclick="generateTeams()">🎲 Générer les équipes</button>
     </div>
     
@@ -368,6 +453,48 @@
     const SHEET_URL = "https://script.google.com/macros/s/AKfycbz-cluPQnWphcfvEhB7QSllsy-6lkJJ3Bcs0XjZ53urGjprl2VXQd5YGW1A23MBaz2hoQ/exec";
 
     let allPlayers = [];
+    let currentFormation = "4-4-2";
+
+    // Positions des joueurs par tactique
+    const formationPositions = {
+      "4-4-2": {
+        G: [{x: 10, y: 50}],
+        D: [
+          {x: 25, y: 20}, {x: 25, y: 40}, {x: 25, y: 60}, {x: 25, y: 80}
+        ],
+        M: [
+          {x: 50, y: 15}, {x: 50, y: 35}, {x: 50, y: 65}, {x: 50, y: 85}
+        ],
+        A: [
+          {x: 75, y: 40}, {x: 75, y: 60}
+        ]
+      },
+      "3-5-2": {
+        G: [{x: 10, y: 50}],
+        D: [
+          {x: 25, y: 30}, {x: 25, y: 50}, {x: 25, y: 70}
+        ],
+        M: [
+          {x: 40, y: 20}, {x: 40, y: 50}, {x: 40, y: 80},
+          {x: 60, y: 30}, {x: 60, y: 70}
+        ],
+        A: [
+          {x: 80, y: 40}, {x: 80, y: 60}
+        ]
+      },
+      "4-3-3": {
+        G: [{x: 10, y: 50}],
+        D: [
+          {x: 25, y: 20}, {x: 25, y: 40}, {x: 25, y: 60}, {x: 25, y: 80}
+        ],
+        M: [
+          {x: 50, y: 30}, {x: 50, y: 50}, {x: 50, y: 70}
+        ],
+        A: [
+          {x: 75, y: 20}, {x: 75, y: 50}, {x: 75, y: 80}
+        ]
+      }
+    };
 
     function App() {
       const [presence, setPresence] = React.useState({});
@@ -375,6 +502,7 @@
       const [teams, setTeams] = React.useState([[], []]);
       const [teamCount, setTeamCount] = React.useState(2);
       const [teamSize, setTeamSize] = React.useState(11);
+      const [formation, setFormation] = React.useState("4-4-2");
 
       React.useEffect(() => {
         fetch(SHEET_URL)
@@ -387,9 +515,14 @@
             setPresence(presentMap);
           });
           
-        // Mise à jour des valeurs initiales
-        document.getElementById('teamCount').value = teamCount;
-        document.getElementById('teamSize').value = teamSize;
+        // Initialisation des boutons de formation
+        document.querySelectorAll('.formation-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.formation-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            setFormation(this.dataset.formation);
+          });
+        });
       }, []);
 
       function togglePresence(id) {
@@ -464,64 +597,102 @@
         setTeams([teamA, teamB]);
       };
 
-      // Fonction pour placer les joueurs sur le terrain
-      const renderPitch = (team, teamName, teamClass) => {
-        // Positions des joueurs sur le terrain
-        const positions = {
-          'G': [{x: 10, y: 50}],
-          'D': [
-            {x: 25, y: 20}, {x: 25, y: 50}, {x: 25, y: 80}
-          ],
-          'M': [
-            {x: 50, y: 10}, {x: 50, y: 30}, {x: 50, y: 50}, 
-            {x: 50, y: 70}, {x: 50, y: 90}
-          ],
-          'A': [
-            {x: 75, y: 30}, {x: 75, y: 50}, {x: 75, y: 70}
-          ]
+      // Fonction pour assigner les joueurs aux postes selon leur préférence et niveau
+      const assignPlayersToPositions = (teamPlayers, formation) => {
+        const positions = formationPositions[formation] || formationPositions["4-4-2"];
+        
+        // Créer des copies pour éviter les mutations
+        const availablePlayers = [...teamPlayers];
+        const assignedPlayers = {
+          G: [],
+          D: [],
+          M: [],
+          A: []
         };
         
-        // Trouver le gardien
-        const gardien = team.find(p => 
-          p["poste préféré"] && p["poste préféré"].toLowerCase().includes("g")
-        );
+        // Fonction pour trouver le meilleur joueur pour un poste
+        const findBestPlayerForPosition = (position) => {
+          // Trouver les joueurs qui ont ce poste en préféré
+          const positionPlayers = availablePlayers.filter(p => 
+            p["poste préféré"] && p["poste préféré"].toUpperCase().includes(position)
+          );
+          
+          if (positionPlayers.length > 0) {
+            // Trier par niveau (points)
+            positionPlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
+            return positionPlayers[0];
+          }
+          
+          // Si aucun joueur n'a ce poste en préféré, prendre le meilleur joueur disponible
+          availablePlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
+          return availablePlayers[0];
+        };
         
-        // Créer un tableau de positions assignées
-        const assignedPositions = {};
-        Object.keys(positions).forEach(pos => {
-          assignedPositions[pos] = [];
-        });
-        
-        // Assigner le gardien
-        if (gardien) {
-          assignedPositions['G'].push(gardien);
+        // Assigner les gardiens en premier
+        if (positions.G.length > 0) {
+          const goalie = findBestPlayerForPosition("G");
+          if (goalie) {
+            assignedPlayers.G.push(goalie);
+            const index = availablePlayers.findIndex(p => p.id === goalie.id);
+            if (index !== -1) availablePlayers.splice(index, 1);
+          }
         }
         
-        // Assigner les autres joueurs par poste
-        team.forEach(player => {
-          if (player === gardien) return;
-          
-          // Déterminer le poste principal
-          let poste = 'M'; // Milieu par défaut
-          if (player["poste préféré"]) {
-            const p = player["poste préféré"].toUpperCase();
-            if (p.includes('G')) poste = 'G';
-            else if (p.includes('D')) poste = 'D';
-            else if (p.includes('M')) poste = 'M';
-            else if (p.includes('A')) poste = 'A';
+        // Assigner les défenseurs
+        if (positions.D.length > 0) {
+          for (let i = 0; i < positions.D.length && availablePlayers.length > 0; i++) {
+            const defender = findBestPlayerForPosition("D");
+            if (defender) {
+              assignedPlayers.D.push(defender);
+              const index = availablePlayers.findIndex(p => p.id === defender.id);
+              if (index !== -1) availablePlayers.splice(index, 1);
+            }
           }
-          
-          // Ajouter au poste correspondant
-          if (assignedPositions[poste].length < positions[poste].length) {
-            assignedPositions[poste].push(player);
-          } else {
-            // Si le poste est plein, trouver un autre poste
-            if (assignedPositions['D'].length < positions['D'].length) poste = 'D';
-            else if (assignedPositions['M'].length < positions['M'].length) poste = 'M';
-            else if (assignedPositions['A'].length < positions['A'].length) poste = 'A';
-            assignedPositions[poste].push(player);
+        }
+        
+        // Assigner les milieux
+        if (positions.M.length > 0) {
+          for (let i = 0; i < positions.M.length && availablePlayers.length > 0; i++) {
+            const midfielder = findBestPlayerForPosition("M");
+            if (midfielder) {
+              assignedPlayers.M.push(midfielder);
+              const index = availablePlayers.findIndex(p => p.id === midfielder.id);
+              if (index !== -1) availablePlayers.splice(index, 1);
+            }
           }
-        });
+        }
+        
+        // Assigner les attaquants
+        if (positions.A.length > 0) {
+          for (let i = 0; i < positions.A.length && availablePlayers.length > 0; i++) {
+            const attacker = findBestPlayerForPosition("A");
+            if (attacker) {
+              assignedPlayers.A.push(attacker);
+              const index = availablePlayers.findIndex(p => p.id === attacker.id);
+              if (index !== -1) availablePlayers.splice(index, 1);
+            }
+          }
+        }
+        
+        // Les joueurs restants deviennent des remplaçants
+        const substitutes = [...availablePlayers];
+        
+        return {
+          titulaires: [
+            ...assignedPlayers.G,
+            ...assignedPlayers.D,
+            ...assignedPlayers.M,
+            ...assignedPlayers.A
+          ],
+          substitutes
+        };
+      };
+
+      // Fonction pour placer les joueurs sur le terrain
+      const renderPitch = (team, teamName, teamClass) => {
+        // Assigner les joueurs aux postes
+        const { titulaires, substitutes } = assignPlayersToPositions(team, formation);
+        const positions = formationPositions[formation] || formationPositions["4-4-2"];
         
         // Calculer les points totaux
         const totalPoints = team.reduce((sum, player) => sum + parseInt(player.points || 0), 0);
@@ -531,7 +702,7 @@
             <div className="team-title">
               <span>{teamName}</span>
               <span className="badge level">{totalPoints} pts</span>
-              <span className="badge position">{team.length} joueurs</span>
+              <span className="badge position">{formation}</span>
             </div>
             
             <div className="pitch">
@@ -542,34 +713,120 @@
               <div className="goal-area left"></div>
               <div className="goal-area right"></div>
               
-              {/* Placement des joueurs */}
-              {Object.keys(positions).map(pos => (
-                positions[pos].map((posCoord, idx) => {
-                  const player = assignedPositions[pos][idx];
-                  if (!player) return null;
-                  
-                  const isGoalkeeper = pos === 'G';
+              {/* Placement des joueurs titulaires */}
+              {positions.G.map((posCoord, idx) => {
+                const player = titulaires.find(p => 
+                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("G")
+                );
+                if (!player) return null;
+                
+                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                
+                return (
+                  <div 
+                    key={`${teamName}-${player.id}`}
+                    className={`player-marker ${teamClass} goalkeeper`}
+                    style={{
+                      left: `${posCoord.x}%`,
+                      top: `${posCoord.y}%`,
+                    }}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                  >
+                    {initials}
+                  </div>
+                );
+              })}
+              
+              {positions.D.map((posCoord, idx) => {
+                const defenders = titulaires.filter(p => 
+                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("D")
+                );
+                const player = defenders[idx];
+                if (!player) return null;
+                
+                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                
+                return (
+                  <div 
+                    key={`${teamName}-${player.id}-${idx}`}
+                    className={`player-marker ${teamClass}`}
+                    style={{
+                      left: `${posCoord.x}%`,
+                      top: `${posCoord.y}%`,
+                    }}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                  >
+                    {initials}
+                  </div>
+                );
+              })}
+              
+              {positions.M.map((posCoord, idx) => {
+                const midfielders = titulaires.filter(p => 
+                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("M")
+                );
+                const player = midfielders[idx];
+                if (!player) return null;
+                
+                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                
+                return (
+                  <div 
+                    key={`${teamName}-${player.id}-${idx}`}
+                    className={`player-marker ${teamClass}`}
+                    style={{
+                      left: `${posCoord.x}%`,
+                      top: `${posCoord.y}%`,
+                    }}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                  >
+                    {initials}
+                  </div>
+                );
+              })}
+              
+              {positions.A.map((posCoord, idx) => {
+                const attackers = titulaires.filter(p => 
+                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("A")
+                );
+                const player = attackers[idx];
+                if (!player) return null;
+                
+                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                
+                return (
+                  <div 
+                    key={`${teamName}-${player.id}-${idx}`}
+                    className={`player-marker ${teamClass}`}
+                    style={{
+                      left: `${posCoord.x}%`,
+                      top: `${posCoord.y}%`,
+                    }}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                  >
+                    {initials}
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Remplaçants */}
+            {substitutes.length > 0 && (
+              <div className="substitutes">
+                {substitutes.slice(0, 3).map((player, idx) => {
                   const initials = player.nom.split(' ').map(n => n[0]).join('');
-                  
                   return (
                     <div 
-                      key={`${teamName}-${player.id}`}
-                      className={`player-marker ${teamClass} ${isGoalkeeper ? 'goalkeeper' : ''}`}
-                      style={{
-                        left: `${posCoord.x}%`,
-                        top: `${posCoord.y}%`,
-                      }}
+                      key={`sub-${teamName}-${player.id}-${idx}`}
+                      className={`sub-player ${teamClass}`}
                       title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
                     >
                       {initials}
-                      <div style={{fontSize: '8px', marginTop: '2px'}}>
-                        {player["poste préféré"] || '?'}
-                      </div>
                     </div>
                   );
-                })
-              ))}
-            </div>
+                })}
+              </div>
+            )}
           </div>
         );
       };
@@ -622,6 +879,12 @@
               max="15" 
               onChange={handleTeamSizeChange}
             />
+            
+            <div className="formation-selector">
+              <div className={`formation-btn ${formation === "4-4-2" ? "active" : ""}`} data-formation="4-4-2">4-4-2</div>
+              <div className={`formation-btn ${formation === "3-5-2" ? "active" : ""}`} data-formation="3-5-2">3-5-2</div>
+              <div className={`formation-btn ${formation === "4-3-3" ? "active" : ""}`} data-formation="4-3-3">4-3-3</div>
+            </div>
             
             <button className="btn" onClick={generateTeams}>
               🎲 Générer les équipes
