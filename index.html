@@ -9,54 +9,325 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     body {
-      margin: 0; font-family: 'Montserrat', sans-serif;
-      background: #111; color: #f0c300;
+      margin: 0; 
+      font-family: 'Montserrat', sans-serif;
+      background: #111; 
+      color: #f0c300;
     }
     header {
-      background: black; padding: 15px 20px;
-      display: flex; align-items: center; justify-content: space-between;
+      background: black; 
+      padding: 15px 20px;
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
     }
-    header img { height: 50px; }
-    header h1 { font-size: 1.8rem; margin: 0; color: #f0c300; }
+    header img { 
+      height: 70px; /* Logo agrandi */
+    }
+    header h1 { 
+      font-size: 1.8rem; 
+      margin: 0; 
+      color: #f0c300; 
+      text-align: center;
+      flex-grow: 1;
+    }
     .container {
-      display: flex; flex-wrap: wrap; padding: 20px; gap: 20px;
+      display: flex; 
+      flex-wrap: wrap; 
+      padding: 20px; 
+      gap: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
     }
     .panel {
-      background: #1a1a1a; border-radius: 10px; padding: 20px; flex: 1; min-width: 300px;
+      background: #1a1a1a; 
+      border-radius: 10px; 
+      padding: 20px; 
+      flex: 1; 
+      min-width: 300px;
     }
-    .panel h2 { margin-top: 0; color: #f0c300; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; }
+    .panel h2 { 
+      margin-top: 0; 
+      color: #f0c300; 
+      text-align: center;
+    }
+    .form-group { 
+      margin-bottom: 15px; 
+    }
+    label { 
+      display: block; 
+      margin-bottom: 5px; 
+      font-weight: bold;
+    }
     select, input {
-      width: 100%; padding: 10px; border: none;
-      border-radius: 6px; background: #2a2a2a; color: #fff;
+      width: 100%; 
+      padding: 10px; 
+      border: none;
+      border-radius: 6px; 
+      background: #2a2a2a; 
+      color: #fff;
+      font-size: 16px;
     }
     .btn {
-      background: #f0c300; color: #000;
-      padding: 12px; border: none; font-weight: bold;
-      width: 100%; margin-top: 10px; border-radius: 6px;
+      background: #f0c300; 
+      color: #000;
+      padding: 12px; 
+      border: none; 
+      font-weight: bold;
+      width: 100%; 
+      margin-top: 10px; 
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #ffd700;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(240, 195, 0, 0.3);
     }
     .player-card {
-      display: flex; justify-content: space-between; align-items: center;
-      background: #222; padding: 10px; border-radius: 6px;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      background: #222; 
+      padding: 10px; 
+      border-radius: 6px;
       margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .player-card:hover {
+      background: #2a2a2a;
+      transform: translateX(3px);
     }
     .badge {
-      display: inline-block; padding: 3px 8px; border-radius: 12px;
-      font-size: 0.8rem; margin-right: 5px;
+      display: inline-block; 
+      padding: 3px 8px; 
+      border-radius: 12px;
+      font-size: 0.8rem; 
+      margin-right: 5px;
+      font-weight: bold;
     }
-    .badge.level { background: #333; color: #f0c300; }
-    .badge.position { background: #444; color: #0cf; }
-    .badge.foot { background: #333; color: #fa3; }
-    .teams { display: flex; gap: 20px; flex-wrap: wrap; }
-    .team {
-      flex: 1; background: #1e1e1e; padding: 10px;
-      border-radius: 6px; min-width: 250px;
+    .badge.level { 
+      background: #333; 
+      color: #f0c300; 
     }
-    .team h3 { text-align: center; color: #f0c300; }
-    .team .player {
-      padding: 6px 0; border-bottom: 1px solid #333;
+    .badge.position { 
+      background: #444; 
+      color: #0cf; 
+    }
+    .badge.foot { 
+      background: #333; 
+      color: #fa3; 
+    }
+    
+    /* Style pour les terrains de football */
+    .pitch-container {
+      width: 100%;
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+    
+    .pitch {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      height: 350px;
+      background: #0a5f20;
+      border: 3px solid #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 auto;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+    
+    /* Lignes du terrain */
+    .pitch::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: 100%;
+      background: #fff;
+    }
+    
+    .center-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    
+    .penalty-area {
+      position: absolute;
+      width: 120px;
+      height: 200px;
+      border: 2px solid #fff;
+    }
+    
+    .penalty-area.left {
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      border-left: none;
+      border-top-right-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+    
+    .penalty-area.right {
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      border-right: none;
+      border-top-left-radius: 20px;
+      border-bottom-left-radius: 20px;
+    }
+    
+    .goal-area {
+      position: absolute;
+      width: 60px;
+      height: 120px;
+      border: 2px solid #fff;
+    }
+    
+    .goal-area.left {
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      border-left: none;
+    }
+    
+    .goal-area.right {
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      border-right: none;
+    }
+    
+    .player-marker {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 10px;
+      text-align: center;
+      padding: 2px;
+      transition: all 0.3s;
+      z-index: 10;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background-size: cover;
+    }
+    
+    .player-marker:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      z-index: 20;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    
+    .player-marker.team-a {
+      background: linear-gradient(145deg, #ffd700, #f0c300);
+      color: #000;
+      border: 2px solid #d4af37;
+    }
+    
+    .player-marker.team-b {
+      background: linear-gradient(145deg, #333, #000);
+      color: #fff;
+      border: 2px solid #444;
+    }
+    
+    .player-marker.goalkeeper {
+      border: 3px solid #ff0000;
+    }
+    
+    .team-title {
+      text-align: center;
+      font-size: 1.5rem;
+      margin: 10px 0;
+      color: #f0c300;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .team-title .badge {
+      font-size: 1rem;
+      padding: 5px 12px;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        padding: 10px;
+      }
+      
+      .panel {
+        min-width: 100%;
+      }
+      
+      .pitch {
+        height: 300px;
+      }
+      
+      .player-marker {
+        width: 40px;
+        height: 40px;
+        font-size: 8px;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      header h1 {
+        margin: 10px 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .pitch {
+        height: 250px;
+      }
+      
+      .player-marker {
+        width: 35px;
+        height: 35px;
+        font-size: 7px;
+      }
+      
+      .team-title {
+        font-size: 1.2rem;
+      }
+    }
+    
+    /* Animation pour la génération */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
     }
   </style>
 </head>
@@ -65,22 +336,32 @@
     <h1>Générateur d'Équipes ESLM</h1>
     <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="Logo ESLM">
   </header>
+  
   <div class="container">
     <div class="panel">
       <h2>Configuration</h2>
+      <div class="form-group">
+        <label for="teamCount">Nombre d'équipes</label>
+        <select id="teamCount">
+          <option value="1">1 équipe</option>
+          <option value="2" selected>2 équipes</option>
+        </select>
+      </div>
       <div class="form-group">
         <label for="teamSize">Taille max. par équipe</label>
         <input type="number" id="teamSize" value="11" min="5" max="15" />
       </div>
       <button class="btn" onclick="generateTeams()">🎲 Générer les équipes</button>
     </div>
+    
     <div class="panel" style="flex:2">
       <h2>Joueurs disponibles</h2>
       <div id="playersList"></div>
     </div>
   </div>
+  
   <div class="container">
-    <div class="teams" id="teamsDisplay"></div>
+    <div class="pitch-container" id="teamsDisplay"></div>
   </div>
 
   <script type="text/babel">
@@ -92,6 +373,8 @@
       const [presence, setPresence] = React.useState({});
       const [players, setPlayers] = React.useState([]);
       const [teams, setTeams] = React.useState([[], []]);
+      const [teamCount, setTeamCount] = React.useState(2);
+      const [teamSize, setTeamSize] = React.useState(11);
 
       React.useEffect(() => {
         fetch(SHEET_URL)
@@ -103,30 +386,192 @@
             setPlayers(data);
             setPresence(presentMap);
           });
+          
+        // Mise à jour des valeurs initiales
+        document.getElementById('teamCount').value = teamCount;
+        document.getElementById('teamSize').value = teamSize;
       }, []);
 
       function togglePresence(id) {
         const updated = { ...presence, [id]: !presence[id] };
         setPresence(updated);
       }
+      
+      function handleTeamCountChange(e) {
+        setTeamCount(parseInt(e.target.value));
+      }
+      
+      function handleTeamSizeChange(e) {
+        const size = Math.max(5, Math.min(15, parseInt(e.target.value) || 11));
+        setTeamSize(size);
+      }
 
       window.generateTeams = () => {
+        const count = parseInt(document.getElementById('teamCount').value);
+        const size = parseInt(document.getElementById('teamSize').value);
+        setTeamCount(count);
+        setTeamSize(size);
+        
         const actifs = players.filter(p => presence[p.id]);
         const triés = actifs.sort((a, b) => (parseInt(b.points || 0) - parseInt(a.points || 0)));
-        const teamA = [], teamB = [];
-        let sumA = 0, sumB = 0;
+        
+        // Trouver les gardiens
+        const gardiens = triés.filter(p => 
+          p["poste préféré"] && p["poste préféré"].toLowerCase().includes("g")
+        );
+        
+        // Si on a au moins un gardien, on le place prioritairement
+        let teamA = [];
+        let teamB = [];
+        
+        if (count === 1) {
+          // Génération d'une seule équipe
+          teamA = [...triés].slice(0, size);
+        } else {
+          // Génération de deux équipes
+          let sumA = 0, sumB = 0;
+          
+          // Placement prioritaire des gardiens
+          if (gardiens.length >= 2) {
+            teamA.push(gardiens[0]);
+            teamB.push(gardiens[1]);
+            sumA += parseInt(gardiens[0].points || 0);
+            sumB += parseInt(gardiens[1].points || 0);
+          } else if (gardiens.length === 1) {
+            teamA.push(gardiens[0]);
+            sumA += parseInt(gardiens[0].points || 0);
+          }
+          
+          // Répartition des autres joueurs
+          triés.forEach(p => {
+            // Ignorer les joueurs déjà placés (gardiens)
+            if (gardiens.includes(p)) return;
+            
+            // Ignorer si les équipes sont pleines
+            if (teamA.length >= size || teamB.length >= size) return;
+            
+            if (teamA.length < teamB.length || 
+                (teamA.length === teamB.length && sumA <= sumB)) {
+              teamA.push(p);
+              sumA += parseInt(p.points || 0);
+            } else {
+              teamB.push(p);
+              sumB += parseInt(p.points || 0);
+            }
+          });
+        }
+        
+        setTeams([teamA, teamB]);
+      };
 
-        triés.forEach(p => {
-          if (sumA <= sumB) {
-            teamA.push(p);
-            sumA += parseInt(p.points || 0);
+      // Fonction pour placer les joueurs sur le terrain
+      const renderPitch = (team, teamName, teamClass) => {
+        // Positions des joueurs sur le terrain
+        const positions = {
+          'G': [{x: 10, y: 50}],
+          'D': [
+            {x: 25, y: 20}, {x: 25, y: 50}, {x: 25, y: 80}
+          ],
+          'M': [
+            {x: 50, y: 10}, {x: 50, y: 30}, {x: 50, y: 50}, 
+            {x: 50, y: 70}, {x: 50, y: 90}
+          ],
+          'A': [
+            {x: 75, y: 30}, {x: 75, y: 50}, {x: 75, y: 70}
+          ]
+        };
+        
+        // Trouver le gardien
+        const gardien = team.find(p => 
+          p["poste préféré"] && p["poste préféré"].toLowerCase().includes("g")
+        );
+        
+        // Créer un tableau de positions assignées
+        const assignedPositions = {};
+        Object.keys(positions).forEach(pos => {
+          assignedPositions[pos] = [];
+        });
+        
+        // Assigner le gardien
+        if (gardien) {
+          assignedPositions['G'].push(gardien);
+        }
+        
+        // Assigner les autres joueurs par poste
+        team.forEach(player => {
+          if (player === gardien) return;
+          
+          // Déterminer le poste principal
+          let poste = 'M'; // Milieu par défaut
+          if (player["poste préféré"]) {
+            const p = player["poste préféré"].toUpperCase();
+            if (p.includes('G')) poste = 'G';
+            else if (p.includes('D')) poste = 'D';
+            else if (p.includes('M')) poste = 'M';
+            else if (p.includes('A')) poste = 'A';
+          }
+          
+          // Ajouter au poste correspondant
+          if (assignedPositions[poste].length < positions[poste].length) {
+            assignedPositions[poste].push(player);
           } else {
-            teamB.push(p);
-            sumB += parseInt(p.points || 0);
+            // Si le poste est plein, trouver un autre poste
+            if (assignedPositions['D'].length < positions['D'].length) poste = 'D';
+            else if (assignedPositions['M'].length < positions['M'].length) poste = 'M';
+            else if (assignedPositions['A'].length < positions['A'].length) poste = 'A';
+            assignedPositions[poste].push(player);
           }
         });
-
-        setTeams([teamA, teamB]);
+        
+        // Calculer les points totaux
+        const totalPoints = team.reduce((sum, player) => sum + parseInt(player.points || 0), 0);
+        
+        return (
+          <div className="fade-in" style={{width: '100%', maxWidth: '500px'}}>
+            <div className="team-title">
+              <span>{teamName}</span>
+              <span className="badge level">{totalPoints} pts</span>
+              <span className="badge position">{team.length} joueurs</span>
+            </div>
+            
+            <div className="pitch">
+              {/* Éléments du terrain */}
+              <div className="center-circle"></div>
+              <div className="penalty-area left"></div>
+              <div className="penalty-area right"></div>
+              <div className="goal-area left"></div>
+              <div className="goal-area right"></div>
+              
+              {/* Placement des joueurs */}
+              {Object.keys(positions).map(pos => (
+                positions[pos].map((posCoord, idx) => {
+                  const player = assignedPositions[pos][idx];
+                  if (!player) return null;
+                  
+                  const isGoalkeeper = pos === 'G';
+                  const initials = player.nom.split(' ').map(n => n[0]).join('');
+                  
+                  return (
+                    <div 
+                      key={`${teamName}-${player.id}`}
+                      className={`player-marker ${teamClass} ${isGoalkeeper ? 'goalkeeper' : ''}`}
+                      style={{
+                        left: `${posCoord.x}%`,
+                        top: `${posCoord.y}%`,
+                      }}
+                      title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                    >
+                      {initials}
+                      <div style={{fontSize: '8px', marginTop: '2px'}}>
+                        {player["poste préféré"] || '?'}
+                      </div>
+                    </div>
+                  );
+                })
+              ))}
+            </div>
+          </div>
+        );
       };
 
       return (
@@ -138,31 +583,55 @@
                 <span className="badge level">{p.étoiles || "?"} ⭐</span>
                 <span className="badge position">{p["poste préféré"] || "?"}</span>
                 <span className="badge foot">{p.pied || "?"}</span>
+                <span className="badge level">{p.points || "0"} pts</span>
               </div>
               <label>
-                <input type="checkbox" checked={presence[p.id] || false} onChange={() => togglePresence(p.id)} />
+                <input 
+                  type="checkbox" 
+                  checked={presence[p.id] || false} 
+                  onChange={() => togglePresence(p.id)} 
+                />
+                Présent
               </label>
             </div>
           ))}
-          <div className="teams">
-            <div className="team">
-              <h3>🟡 Équipe A</h3>
-              {teams[0].map(p => (
-                <div key={p.id} className="player">{p.nom} – {p["poste préféré"]}</div>
-              ))}
-            </div>
-            <div className="team">
-              <h3>⚫ Équipe B</h3>
-              {teams[1].map(p => (
-                <div key={p.id} className="player">{p.nom} – {p["poste préféré"]}</div>
-              ))}
-            </div>
+          
+          <div className="pitch-container">
+            {teams[0].length > 0 && renderPitch(teams[0], "🟡 Équipe A", "team-a")}
+            {teamCount === 2 && teams[1].length > 0 && renderPitch(teams[1], "⚫ Équipe B", "team-b")}
+          </div>
+          
+          <div className="form-group" style={{marginTop: '20px'}}>
+            <label htmlFor="teamCountSelect">Nombre d'équipes</label>
+            <select 
+              id="teamCountSelect" 
+              value={teamCount} 
+              onChange={handleTeamCountChange}
+              style={{marginBottom: '15px'}}
+            >
+              <option value={1}>1 équipe</option>
+              <option value={2}>2 équipes</option>
+            </select>
+            
+            <label htmlFor="teamSizeInput">Taille max. par équipe</label>
+            <input 
+              type="number" 
+              id="teamSizeInput" 
+              value={teamSize} 
+              min="5" 
+              max="15" 
+              onChange={handleTeamSizeChange}
+            />
+            
+            <button className="btn" onClick={generateTeams}>
+              🎲 Générer les équipes
+            </button>
           </div>
         </>
       );
     }
 
-    ReactDOM.render(<App />, document.getElementById("playersList"));
+    ReactDOM.render(<App />, document.body.appendChild(document.createElement('div')));
   </script>
 </body>
 </html>
