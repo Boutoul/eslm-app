@@ -214,16 +214,15 @@
     
     .player-marker {
       position: absolute;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
+      min-width: 60px;
+      padding: 5px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 10px;
+      font-size: 11px;
       text-align: center;
-      padding: 2px;
       transition: all 0.3s;
       z-index: 10;
       transform: translate(-50%, -50%);
@@ -231,8 +230,8 @@
       box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       overflow: hidden;
       text-overflow: ellipsis;
-      background-size: cover;
       flex-direction: column;
+      line-height: 1.2;
     }
     
     .player-marker:hover {
@@ -257,6 +256,26 @@
       border: 3px solid #ff0000;
     }
     
+    .player-marker.secondary {
+      border: 2px dashed #ff00ff;
+    }
+    
+    .player-name {
+      font-weight: bold;
+      font-size: 10px;
+      white-space: nowrap;
+    }
+    
+    .player-position {
+      font-size: 9px;
+      opacity: 0.8;
+    }
+    
+    .player-points {
+      font-size: 9px;
+      margin-top: 2px;
+    }
+    
     .substitutes {
       display: flex;
       justify-content: center;
@@ -266,19 +285,19 @@
     }
     
     .sub-player {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
+      min-width: 55px;
+      padding: 5px;
+      border-radius: 6px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 9px;
-      padding: 2px;
+      font-size: 10px;
       text-align: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       overflow: hidden;
       text-overflow: ellipsis;
-      flex-direction: column;
+      line-height: 1.2;
     }
     
     .sub-player.team-a {
@@ -338,6 +357,16 @@
       background: #3a3a3a;
     }
     
+    .penalty-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      background: #2a2a2a;
+      border-radius: 6px;
+    }
+    
     /* Responsive design */
     @media (max-width: 768px) {
       .container {
@@ -354,9 +383,13 @@
       }
       
       .player-marker {
-        width: 40px;
-        height: 40px;
-        font-size: 8px;
+        min-width: 50px;
+        font-size: 9px;
+        padding: 4px;
+      }
+      
+      .player-name {
+        font-size: 9px;
       }
       
       header {
@@ -369,9 +402,8 @@
       }
       
       .sub-player {
-        width: 40px;
-        height: 40px;
-        font-size: 8px;
+        min-width: 45px;
+        font-size: 9px;
       }
     }
     
@@ -381,9 +413,13 @@
       }
       
       .player-marker {
-        width: 35px;
-        height: 35px;
-        font-size: 7px;
+        min-width: 45px;
+        font-size: 8px;
+        padding: 3px;
+      }
+      
+      .player-name {
+        font-size: 8px;
       }
       
       .team-title {
@@ -391,9 +427,8 @@
       }
       
       .sub-player {
-        width: 35px;
-        height: 35px;
-        font-size: 7px;
+        min-width: 40px;
+        font-size: 8px;
       }
     }
     
@@ -435,6 +470,10 @@
           <div class="formation-btn" data-formation="3-5-2">3-5-2</div>
           <div class="formation-btn" data-formation="4-3-3">4-3-3</div>
         </div>
+      </div>
+      <div class="penalty-toggle">
+        <input type="checkbox" id="allowPositionSwitch" checked />
+        <label for="allowPositionSwitch">Permettre changement de poste (-10 pts)</label>
       </div>
       <button class="btn" onclick="generateTeams()">🎲 Générer les équipes</button>
     </div>
@@ -503,6 +542,7 @@
       const [teamCount, setTeamCount] = React.useState(2);
       const [teamSize, setTeamSize] = React.useState(11);
       const [formation, setFormation] = React.useState("4-4-2");
+      const [allowPositionSwitch, setAllowPositionSwitch] = React.useState(true);
 
       React.useEffect(() => {
         fetch(SHEET_URL)
@@ -537,6 +577,10 @@
       function handleTeamSizeChange(e) {
         const size = Math.max(5, Math.min(15, parseInt(e.target.value) || 11));
         setTeamSize(size);
+      }
+      
+      function togglePositionSwitch() {
+        setAllowPositionSwitch(!allowPositionSwitch);
       }
 
       window.generateTeams = () => {
@@ -600,8 +644,6 @@
       // Fonction pour assigner les joueurs aux postes selon leur préférence et niveau
       const assignPlayersToPositions = (teamPlayers, formation) => {
         const positions = formationPositions[formation] || formationPositions["4-4-2"];
-        
-        // Créer des copies pour éviter les mutations
         const availablePlayers = [...teamPlayers];
         const assignedPlayers = {
           G: [],
@@ -613,64 +655,65 @@
         // Fonction pour trouver le meilleur joueur pour un poste
         const findBestPlayerForPosition = (position) => {
           // Trouver les joueurs qui ont ce poste en préféré
-          const positionPlayers = availablePlayers.filter(p => 
+          const primaryPlayers = availablePlayers.filter(p => 
             p["poste préféré"] && p["poste préféré"].toUpperCase().includes(position)
           );
           
-          if (positionPlayers.length > 0) {
+          if (primaryPlayers.length > 0) {
             // Trier par niveau (points)
-            positionPlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
-            return positionPlayers[0];
+            primaryPlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
+            return { player: primaryPlayers[0], penalty: 0 };
           }
           
-          // Si aucun joueur n'a ce poste en préféré, prendre le meilleur joueur disponible
-          availablePlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
-          return availablePlayers[0];
+          // Si on permet le changement de poste
+          if (allowPositionSwitch) {
+            // Prendre le meilleur joueur disponible avec pénalité
+            availablePlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
+            if (availablePlayers.length > 0) {
+              return { player: availablePlayers[0], penalty: 10 };
+            }
+          }
+          
+          return null;
         };
         
         // Assigner les gardiens en premier
         if (positions.G.length > 0) {
           const goalie = findBestPlayerForPosition("G");
           if (goalie) {
-            assignedPlayers.G.push(goalie);
-            const index = availablePlayers.findIndex(p => p.id === goalie.id);
+            assignedPlayers.G.push({ ...goalie.player, penalty: goalie.penalty });
+            const index = availablePlayers.findIndex(p => p.id === goalie.player.id);
             if (index !== -1) availablePlayers.splice(index, 1);
           }
         }
         
         // Assigner les défenseurs
-        if (positions.D.length > 0) {
-          for (let i = 0; i < positions.D.length && availablePlayers.length > 0; i++) {
-            const defender = findBestPlayerForPosition("D");
-            if (defender) {
-              assignedPlayers.D.push(defender);
-              const index = availablePlayers.findIndex(p => p.id === defender.id);
-              if (index !== -1) availablePlayers.splice(index, 1);
-            }
+        for (let i = 0; i < positions.D.length; i++) {
+          const defender = findBestPlayerForPosition("D");
+          if (defender) {
+            assignedPlayers.D.push({ ...defender.player, penalty: defender.penalty });
+            const index = availablePlayers.findIndex(p => p.id === defender.player.id);
+            if (index !== -1) availablePlayers.splice(index, 1);
           }
         }
         
         // Assigner les milieux
-        if (positions.M.length > 0) {
-          for (let i = 0; i < positions.M.length && availablePlayers.length > 0; i++) {
-            const midfielder = findBestPlayerForPosition("M");
-            if (midfielder) {
-              assignedPlayers.M.push(midfielder);
-              const index = availablePlayers.findIndex(p => p.id === midfielder.id);
-              if (index !== -1) availablePlayers.splice(index, 1);
-            }
+        for (let i = 0; i < positions.M.length; i++) {
+          const midfielder = findBestPlayerForPosition("M");
+          if (midfielder) {
+            assignedPlayers.M.push({ ...midfielder.player, penalty: midfielder.penalty });
+            const index = availablePlayers.findIndex(p => p.id === midfielder.player.id);
+            if (index !== -1) availablePlayers.splice(index, 1);
           }
         }
         
         // Assigner les attaquants
-        if (positions.A.length > 0) {
-          for (let i = 0; i < positions.A.length && availablePlayers.length > 0; i++) {
-            const attacker = findBestPlayerForPosition("A");
-            if (attacker) {
-              assignedPlayers.A.push(attacker);
-              const index = availablePlayers.findIndex(p => p.id === attacker.id);
-              if (index !== -1) availablePlayers.splice(index, 1);
-            }
+        for (let i = 0; i < positions.A.length; i++) {
+          const attacker = findBestPlayerForPosition("A");
+          if (attacker) {
+            assignedPlayers.A.push({ ...attacker.player, penalty: attacker.penalty });
+            const index = availablePlayers.findIndex(p => p.id === attacker.player.id);
+            if (index !== -1) availablePlayers.splice(index, 1);
           }
         }
         
@@ -694,8 +737,10 @@
         const { titulaires, substitutes } = assignPlayersToPositions(team, formation);
         const positions = formationPositions[formation] || formationPositions["4-4-2"];
         
-        // Calculer les points totaux
-        const totalPoints = team.reduce((sum, player) => sum + parseInt(player.points || 0), 0);
+        // Calculer les points totaux avec pénalités
+        const totalPoints = titulaires.reduce((sum, player) => 
+          sum + parseInt(player.points || 0) - (player.penalty || 0), 0
+        );
         
         return (
           <div className="fade-in" style={{width: '100%', maxWidth: '500px'}}>
@@ -717,94 +762,104 @@
               {positions.G.map((posCoord, idx) => {
                 const player = titulaires.find(p => 
                   p["poste préféré"] && p["poste préféré"].toUpperCase().includes("G")
-                );
+                ) || titulaires[idx];
                 if (!player) return null;
                 
-                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                const points = parseInt(player.points || 0) - (player.penalty || 0);
                 
                 return (
                   <div 
                     key={`${teamName}-${player.id}`}
-                    className={`player-marker ${teamClass} goalkeeper`}
+                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''} goalkeeper`}
                     style={{
                       left: `${posCoord.x}%`,
                       top: `${posCoord.y}%`,
                     }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${points} pts`}
                   >
-                    {initials}
+                    <div className="player-name">{player.nom.split(' ')[0]}</div>
+                    <div className="player-points">{points} pts</div>
                   </div>
                 );
               })}
               
               {positions.D.map((posCoord, idx) => {
-                const defenders = titulaires.filter(p => 
-                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("D")
-                );
-                const player = defenders[idx];
+                const player = titulaires.filter(p => 
+                  !p["poste préféré"]?.toUpperCase().includes("G")
+                )[idx];
                 if (!player) return null;
                 
-                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                const points = parseInt(player.points || 0) - (player.penalty || 0);
+                const isPreferred = player["poste préféré"]?.toUpperCase().includes("D");
                 
                 return (
                   <div 
                     key={`${teamName}-${player.id}-${idx}`}
-                    className={`player-marker ${teamClass}`}
+                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''}`}
                     style={{
                       left: `${posCoord.x}%`,
                       top: `${posCoord.y}%`,
                     }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${points} pts`}
                   >
-                    {initials}
+                    <div className="player-name">{player.nom.split(' ')[0]}</div>
+                    <div className="player-position">{isPreferred ? "Défense" : "Adapté"}</div>
+                    <div className="player-points">{points} pts</div>
                   </div>
                 );
               })}
               
               {positions.M.map((posCoord, idx) => {
-                const midfielders = titulaires.filter(p => 
-                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("M")
-                );
-                const player = midfielders[idx];
+                const player = titulaires.filter(p => 
+                  !p["poste préféré"]?.toUpperCase().includes("G") &&
+                  !p["poste préféré"]?.toUpperCase().includes("D")
+                )[idx];
                 if (!player) return null;
                 
-                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                const points = parseInt(player.points || 0) - (player.penalty || 0);
+                const isPreferred = player["poste préféré"]?.toUpperCase().includes("M");
                 
                 return (
                   <div 
                     key={`${teamName}-${player.id}-${idx}`}
-                    className={`player-marker ${teamClass}`}
+                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''}`}
                     style={{
                       left: `${posCoord.x}%`,
                       top: `${posCoord.y}%`,
                     }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${points} pts`}
                   >
-                    {initials}
+                    <div className="player-name">{player.nom.split(' ')[0]}</div>
+                    <div className="player-position">{isPreferred ? "Milieu" : "Adapté"}</div>
+                    <div className="player-points">{points} pts</div>
                   </div>
                 );
               })}
               
               {positions.A.map((posCoord, idx) => {
-                const attackers = titulaires.filter(p => 
-                  p["poste préféré"] && p["poste préféré"].toUpperCase().includes("A")
-                );
-                const player = attackers[idx];
+                const player = titulaires.filter(p => 
+                  !p["poste préféré"]?.toUpperCase().includes("G") &&
+                  !p["poste préféré"]?.toUpperCase().includes("D") &&
+                  !p["poste préféré"]?.toUpperCase().includes("M")
+                )[idx];
                 if (!player) return null;
                 
-                const initials = player.nom.split(' ').map(n => n[0]).join('');
+                const points = parseInt(player.points || 0) - (player.penalty || 0);
+                const isPreferred = player["poste préféré"]?.toUpperCase().includes("A");
                 
                 return (
                   <div 
                     key={`${teamName}-${player.id}-${idx}`}
-                    className={`player-marker ${teamClass}`}
+                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''}`}
                     style={{
                       left: `${posCoord.x}%`,
                       top: `${posCoord.y}%`,
                     }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                    title={`${player.nom} - ${player["poste préféré"] || '?'} - ${points} pts`}
                   >
-                    {initials}
+                    <div className="player-name">{player.nom.split(' ')[0]}</div>
+                    <div className="player-position">{isPreferred ? "Attaque" : "Adapté"}</div>
+                    <div className="player-points">{points} pts</div>
                   </div>
                 );
               })}
@@ -813,15 +868,20 @@
             {/* Remplaçants */}
             {substitutes.length > 0 && (
               <div className="substitutes">
+                <div style={{width: '100%', textAlign: 'center', margin: '5px 0', fontSize: '14px'}}>
+                  Remplaçants
+                </div>
                 {substitutes.slice(0, 3).map((player, idx) => {
-                  const initials = player.nom.split(' ').map(n => n[0]).join('');
+                  const points = parseInt(player.points || 0);
                   return (
                     <div 
                       key={`sub-${teamName}-${player.id}-${idx}`}
                       className={`sub-player ${teamClass}`}
-                      title={`${player.nom} - ${player["poste préféré"] || '?'} - ${player.points || '0'} pts`}
+                      title={`${player.nom} - ${player["poste préféré"] || '?'} - ${points} pts`}
                     >
-                      {initials}
+                      <div>{player.nom.split(' ')[0]}</div>
+                      <div>{player["poste préféré"] || '?'}</div>
+                      <div>{points} pts</div>
                     </div>
                   );
                 })}
@@ -884,6 +944,16 @@
               <div className={`formation-btn ${formation === "4-4-2" ? "active" : ""}`} data-formation="4-4-2">4-4-2</div>
               <div className={`formation-btn ${formation === "3-5-2" ? "active" : ""}`} data-formation="3-5-2">3-5-2</div>
               <div className={`formation-btn ${formation === "4-3-3" ? "active" : ""}`} data-formation="4-3-3">4-3-3</div>
+            </div>
+            
+            <div className="penalty-toggle">
+              <input 
+                type="checkbox" 
+                id="positionSwitchInput" 
+                checked={allowPositionSwitch} 
+                onChange={togglePositionSwitch}
+              />
+              <label htmlFor="positionSwitchInput">Permettre changement de poste (-10 pts)</label>
             </div>
             
             <button className="btn" onClick={generateTeams}>
