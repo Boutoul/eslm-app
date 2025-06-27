@@ -30,16 +30,18 @@
     }
     
     header img { 
-      height: 70px;
+      height: 100px; /* Logo plus grand */
     }
     
     header h1 { 
-      font-size: 1.8rem; 
+      font-size: 2.2rem; 
       margin: 0; 
       color: #f0c300; 
       text-align: center;
       flex-grow: 1;
       padding: 0 15px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(240, 195, 0, 0.7);
     }
     
     .container {
@@ -47,7 +49,7 @@
       flex-wrap: wrap; 
       padding: 20px; 
       gap: 20px;
-      max-width: 1600px;
+      max-width: 1800px;
       margin: 0 auto;
       justify-content: center;
     }
@@ -67,6 +69,7 @@
       text-align: center;
       padding-bottom: 10px;
       border-bottom: 2px solid #f0c300;
+      font-size: 1.5rem;
     }
     
     .form-group { 
@@ -78,11 +81,12 @@
       margin-bottom: 5px; 
       font-weight: bold;
       color: #f0c300;
+      font-size: 1.1rem;
     }
     
     select, input {
       width: 100%; 
-      padding: 10px; 
+      padding: 12px; 
       border: none;
       border-radius: 6px; 
       background: #2a2a2a; 
@@ -93,14 +97,14 @@
     .btn {
       background: #f0c300; 
       color: #000;
-      padding: 12px; 
+      padding: 14px; 
       border: none; 
       font-weight: bold;
       width: 100%; 
-      margin-top: 10px; 
+      margin-top: 15px; 
       border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       transition: all 0.3s;
       display: flex;
       align-items: center;
@@ -111,7 +115,7 @@
     .btn:hover {
       background: #ffd700;
       transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(240, 195, 0, 0.3);
+      box-shadow: 0 4px 12px rgba(240, 195, 0, 0.5);
     }
     
     .player-card {
@@ -119,9 +123,9 @@
       justify-content: space-between; 
       align-items: center;
       background: #222; 
-      padding: 12px; 
+      padding: 14px; 
       border-radius: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       transition: all 0.2s;
       border-left: 4px solid #f0c300;
     }
@@ -129,15 +133,15 @@
     .player-card:hover {
       background: #2a2a2a;
       transform: translateX(5px);
-      box-shadow: 0 3px 8px rgba(240, 195, 0, 0.2);
+      box-shadow: 0 3px 10px rgba(240, 195, 0, 0.3);
     }
     
     .badge {
       display: inline-block; 
-      padding: 3px 8px; 
+      padding: 4px 10px; 
       border-radius: 12px;
-      font-size: 0.8rem; 
-      margin-right: 5px;
+      font-size: 0.9rem; 
+      margin-right: 6px;
       font-weight: bold;
     }
     
@@ -161,27 +165,27 @@
       color: #fff; 
     }
     
-    /* Style pour les terrains de football */
+    /* Style pour les terrains de football - PLUS GRAND */
     .pitch-container {
       width: 100%;
-      margin-top: 20px;
+      margin-top: 30px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 30px;
+      gap: 40px;
     }
     
     .pitch {
       position: relative;
       width: 100%;
-      max-width: 500px;
-      height: 350px;
+      max-width: 700px; /* Terrain plus large */
+      height: 500px; /* Terrain plus haut */
       background: #0a5f20;
-      border: 3px solid #fff;
-      border-radius: 8px;
+      border: 4px solid #fff;
+      border-radius: 10px;
       overflow: hidden;
       margin: 0 auto;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 12px 25px rgba(0,0,0,0.7);
     }
     
     /* Lignes du terrain */
@@ -190,7 +194,7 @@
       position: absolute;
       top: 0;
       left: 50%;
-      width: 2px;
+      width: 3px;
       height: 100%;
       background: #fff;
     }
@@ -199,18 +203,18 @@
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 80px;
-      height: 80px;
-      border: 2px solid #fff;
+      width: 120px;
+      height: 120px;
+      border: 3px solid #fff;
       border-radius: 50%;
       transform: translate(-50%, -50%);
     }
     
     .penalty-area {
       position: absolute;
-      width: 120px;
-      height: 200px;
-      border: 2px solid #fff;
+      width: 160px;
+      height: 280px;
+      border: 3px solid #fff;
     }
     
     .penalty-area.left {
@@ -218,8 +222,8 @@
       left: 0;
       transform: translateY(-50%);
       border-left: none;
-      border-top-right-radius: 20px;
-      border-bottom-right-radius: 20px;
+      border-top-right-radius: 25px;
+      border-bottom-right-radius: 25px;
     }
     
     .penalty-area.right {
@@ -227,15 +231,15 @@
       right: 0;
       transform: translateY(-50%);
       border-right: none;
-      border-top-left-radius: 20px;
-      border-bottom-left-radius: 20px;
+      border-top-left-radius: 25px;
+      border-bottom-left-radius: 25px;
     }
     
     .goal-area {
       position: absolute;
-      width: 60px;
-      height: 120px;
-      border: 2px solid #fff;
+      width: 80px;
+      height: 160px;
+      border: 3px solid #fff;
     }
     
     .goal-area.left {
@@ -254,128 +258,120 @@
     
     .player-marker {
       position: absolute;
-      min-width: 70px;
-      padding: 6px;
-      border-radius: 8px;
+      min-width: 90px; /* Vignettes plus grandes */
+      padding: 8px;
+      border-radius: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 12px;
+      font-size: 14px;
       text-align: center;
       transition: all 0.3s;
       z-index: 10;
       transform: translate(-50%, -50%);
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.2;
-    }
-    
-    .player-marker:hover {
-      transform: translate(-50%, -50%) scale(1.1);
-      z-index: 20;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    }
-    
-    .player-marker.team-a {
-      background: linear-gradient(145deg, #ffd700, #f0c300);
-      color: #000;
-      border: 2px solid #d4af37;
-    }
-    
-    .player-marker.team-b {
-      background: linear-gradient(145deg, #333, #000);
-      color: #fff;
-      border: 2px solid #444;
-    }
-    
-    .player-marker.goalkeeper {
-      border: 3px solid #ff0000;
-    }
-    
-    .player-marker.secondary {
-      border: 2px dashed #ff00ff;
-    }
-    
-    .player-name {
-      font-weight: bold;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    
-    .player-position {
-      font-size: 10px;
-      opacity: 0.9;
-      font-weight: bold;
-    }
-    
-    .player-foot {
-      font-size: 10px;
-      margin-top: 3px;
-    }
-    
-    .substitutes {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 15px;
-      flex-wrap: wrap;
-    }
-    
-    .sub-player {
-      min-width: 65px;
-      padding: 6px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      text-align: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       overflow: hidden;
       text-overflow: ellipsis;
       line-height: 1.3;
     }
     
+    .player-marker:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      z-index: 20;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+    }
+    
+    .player-marker.team-a {
+      background: linear-gradient(145deg, #ffd700, #f0c300);
+      color: #000;
+      border: 3px solid #d4af37;
+    }
+    
+    .player-marker.team-b {
+      background: linear-gradient(145deg, #333, #000);
+      color: #fff;
+      border: 3px solid #444;
+    }
+    
+    .player-marker.goalkeeper {
+      border: 4px solid #ff0000;
+    }
+    
+    .player-name {
+      font-weight: bold;
+      font-size: 14px;
+      white-space: nowrap;
+      margin-bottom: 4px;
+    }
+    
+    .player-foot {
+      font-size: 13px;
+      font-weight: bold;
+      opacity: 0.9;
+    }
+    
+    .substitutes {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .sub-player {
+      min-width: 80px; /* Vignettes remplaçants plus grandes */
+      padding: 8px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      text-align: center;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4;
+    }
+    
     .sub-player.team-a {
       background: linear-gradient(145deg, #ffd700, #f0c300);
       color: #000;
-      border: 2px solid #d4af37;
+      border: 3px solid #d4af37;
     }
     
     .sub-player.team-b {
       background: linear-gradient(145deg, #333, #000);
       color: #fff;
-      border: 2px solid #444;
+      border: 3px solid #444;
     }
     
     .team-title {
       text-align: center;
-      font-size: 1.5rem;
-      margin: 10px 0;
+      font-size: 1.8rem;
+      margin: 15px 0;
       color: #f0c300;
       font-weight: bold;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 15px;
       text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     
     .team-title .badge {
-      font-size: 1rem;
-      padding: 5px 12px;
+      font-size: 1.1rem;
+      padding: 6px 14px;
     }
     
     .formation-selector {
       display: flex;
       justify-content: center;
-      gap: 10px;
-      margin: 15px 0;
+      gap: 12px;
+      margin: 20px 0;
       flex-wrap: wrap;
     }
     
@@ -383,13 +379,14 @@
       background: #2a2a2a;
       color: #f0c300;
       border: 2px solid #f0c300;
-      border-radius: 6px;
-      padding: 8px 15px;
+      border-radius: 8px;
+      padding: 10px 18px;
       font-weight: bold;
       cursor: pointer;
       transition: all 0.3s;
-      min-width: 80px;
+      min-width: 90px;
       text-align: center;
+      font-size: 16px;
     }
     
     .formation-btn.active {
@@ -405,39 +402,51 @@
     .penalty-toggle {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      padding: 10px;
+      gap: 10px;
+      margin-top: 15px;
+      padding: 12px;
       background: #2a2a2a;
-      border-radius: 6px;
+      border-radius: 8px;
+      font-size: 16px;
     }
     
-    .team-strength {
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #f0c300;
+      font-size: 20px;
+    }
+    
+    .team-info {
       display: flex;
       justify-content: space-between;
       margin-top: 10px;
-      padding: 8px;
+      padding: 10px;
       background: #222;
-      border-radius: 6px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 16px;
     }
     
-    .foot-icon {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
+    .error-message {
+      color: #ff5555;
       text-align: center;
-      line-height: 16px;
-      border-radius: 50%;
-      margin-right: 3px;
-      font-size: 12px;
+      padding: 10px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .pitch {
+        height: 450px;
+        max-width: 600px;
+      }
     }
     
-    /* Responsive design */
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
-        padding: 10px;
+        padding: 15px;
       }
       
       .panel {
@@ -445,17 +454,18 @@
       }
       
       .pitch {
-        height: 300px;
+        height: 400px;
+        max-width: 500px;
       }
       
       .player-marker {
-        min-width: 60px;
-        font-size: 11px;
-        padding: 5px;
+        min-width: 80px;
+        font-size: 13px;
+        padding: 7px;
       }
       
       .player-name {
-        font-size: 11px;
+        font-size: 13px;
       }
       
       header {
@@ -464,43 +474,57 @@
       }
       
       header h1 {
-        margin: 10px 0;
-        font-size: 1.5rem;
+        margin: 15px 0;
+        font-size: 1.8rem;
+      }
+      
+      header img {
+        height: 85px;
       }
       
       .sub-player {
-        min-width: 55px;
-        font-size: 10px;
+        min-width: 70px;
+        font-size: 12px;
       }
       
       .formation-btn {
-        padding: 6px 10px;
-        min-width: 70px;
+        padding: 8px 12px;
+        min-width: 80px;
+        font-size: 14px;
       }
     }
     
     @media (max-width: 480px) {
       .pitch {
-        height: 250px;
+        height: 350px;
+        max-width: 400px;
       }
       
       .player-marker {
-        min-width: 50px;
-        font-size: 10px;
-        padding: 4px;
+        min-width: 70px;
+        font-size: 12px;
+        padding: 6px;
       }
       
       .player-name {
-        font-size: 10px;
+        font-size: 12px;
       }
       
       .team-title {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
       }
       
       .sub-player {
-        min-width: 50px;
-        font-size: 9px;
+        min-width: 65px;
+        font-size: 11px;
+      }
+      
+      header h1 {
+        font-size: 1.6rem;
+      }
+      
+      header img {
+        height: 75px;
       }
     }
     
@@ -512,13 +536,6 @@
     
     .fade-in {
       animation: fadeIn 0.5s ease-out forwards;
-    }
-    
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: #f0c300;
-      font-size: 18px;
     }
   </style>
 </head>
@@ -552,7 +569,7 @@
       </div>
       <div class="penalty-toggle">
         <input type="checkbox" id="allowPositionSwitch" checked />
-        <label for="allowPositionSwitch">Permettre changement de poste (-10 pts)</label>
+        <label for="allowPositionSwitch">Permettre changement de poste</label>
       </div>
       <button class="btn" onclick="generateTeams()">
         <span>🎲</span> Générer les équipes
@@ -645,6 +662,7 @@
       const [formation, setFormation] = React.useState("4-4-2");
       const [allowPositionSwitch, setAllowPositionSwitch] = React.useState(true);
       const [isLoading, setIsLoading] = React.useState(true);
+      const [error, setError] = React.useState(null);
 
       React.useEffect(() => {
         setIsLoading(true);
@@ -658,8 +676,10 @@
             setPresence(presentMap);
             setIsLoading(false);
           })
-          .catch(() => {
+          .catch(err => {
             setIsLoading(false);
+            setError("Erreur de chargement des joueurs");
+            console.error("Erreur de chargement:", err);
           });
           
         // Initialisation des boutons de formation
@@ -691,12 +711,18 @@
       }
 
       window.generateTeams = () => {
+        setError(null);
         const count = parseInt(document.getElementById('teamCount').value);
         const size = parseInt(document.getElementById('teamSize').value);
         setTeamCount(count);
         setTeamSize(size);
         
         const actifs = players.filter(p => presence[p.id]);
+        
+        if (actifs.length < (count === 1 ? size : Math.min(size * 2, size + size - 1))) {
+          setError("Pas assez de joueurs présents pour former les équipes");
+          return;
+        }
         
         // Trier par points décroissants pour que l'équipe A soit la plus forte
         const triés = [...actifs].sort((a, b) => (parseInt(b.points || 0) - parseInt(a.points || 0)));
@@ -711,7 +737,7 @@
         
         if (count === 1) {
           // Génération d'une seule équipe
-          teamA = [...triés].slice(0, size);
+          teamA = [...triés].slice(0, Math.min(size, triés.length));
         } else {
           // Génération de deux équipes avec l'équipe A plus forte
           let sumA = 0, sumB = 0;
@@ -732,105 +758,92 @@
             // Ignorer les joueurs déjà placés (gardiens)
             if (gardiens.includes(p)) return;
             
-            // Ignorer si les équipes sont pleines
-            if (teamA.length >= size || teamB.length >= size) return;
+            // Vérifier la taille maximale des équipes
+            if (teamA.length >= size && teamB.length >= size) return;
             
-            // Donner la priorité à l'équipe A
-            if (teamA.length <= teamB.length) {
+            // Équilibrer les équipes avec max 1 joueur de différence
+            const diff = teamA.length - teamB.length;
+            
+            if (teamA.length < size && (diff <= 0 || teamB.length >= size)) {
               teamA.push(p);
               sumA += parseInt(p.points || 0);
-            } else {
+            } else if (teamB.length < size) {
               teamB.push(p);
               sumB += parseInt(p.points || 0);
             }
           });
+          
+          // Équilibrer les équipes si nécessaire
+          const diff = Math.abs(teamA.length - teamB.length);
+          if (diff > 1) {
+            if (teamA.length > teamB.length) {
+              const player = teamA.pop();
+              teamB.push(player);
+            } else {
+              const player = teamB.pop();
+              teamA.push(player);
+            }
+          }
         }
         
         setTeams([teamA, teamB]);
       };
 
-      // Fonction pour assigner les joueurs aux postes selon leur préférence, niveau et pied fort
+      // Fonction pour assigner les joueurs aux postes
       const assignPlayersToPositions = (teamPlayers, formation) => {
         const positions = formationPositions[formation] || formationPositions["4-4-2"];
         const availablePlayers = [...teamPlayers];
-        const assignedPlayers = {
-          G: [],
-          D: [],
-          M: [],
-          A: []
-        };
+        const assignedPlayers = [];
+        const positionsList = [];
         
-        // Fonction pour trouver le meilleur joueur pour un poste avec prise en compte du pied
-        const findBestPlayerForPosition = (position, side) => {
-          // Trouver les joueurs qui ont ce poste en préféré et le bon pied
-          const primaryPlayers = availablePlayers.filter(p => {
-            const isPositionMatch = p["poste préféré"]?.toUpperCase().includes(position);
-            if (!isPositionMatch) return false;
-            
-            // Vérifier la compatibilité du pied
-            if (side === "left" && p.pied?.toLowerCase().includes("gauche")) return true;
-            if (side === "right" && p.pied?.toLowerCase().includes("droit")) return true;
-            if (side.includes("center") && p.pied?.toLowerCase().includes("ambidextre")) return true;
-            
-            // Si aucune correspondance spécifique, prendre tous
-            return true;
+        // Créer une liste de toutes les positions à remplir
+        for (const positionType in positions) {
+          positions[positionType].forEach(pos => {
+            positionsList.push({
+              type: positionType,
+              coords: pos,
+              priority: positionType === "G" ? 1 : 
+                       positionType === "D" ? 2 : 
+                       positionType === "M" ? 3 : 4
+            });
           });
+        }
+        
+        // Trier par priorité (gardien en premier, puis défense, etc.)
+        positionsList.sort((a, b) => a.priority - b.priority);
+        
+        // Assigner les joueurs aux positions
+        positionsList.forEach(posItem => {
+          let bestPlayer = null;
+          let bestScore = -1;
           
-          if (primaryPlayers.length > 0) {
-            // Trier par niveau (points)
-            primaryPlayers.sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
-            return { player: primaryPlayers[0], penalty: 0 };
-          }
-          
-          // Si on permet le changement de poste
-          if (allowPositionSwitch) {
-            // Prendre le meilleur joueur disponible avec pénalité
-            const sortedPlayers = [...availablePlayers].sort((a, b) => parseInt(b.points || 0) - parseInt(a.points || 0));
-            if (sortedPlayers.length > 0) {
-              return { player: sortedPlayers[0], penalty: 10 };
+          // Trouver le meilleur joueur disponible pour cette position
+          for (let i = 0; i < availablePlayers.length; i++) {
+            const player = availablePlayers[i];
+            let score = 0;
+            
+            // Priorité aux joueurs qui ont cette position en préférée
+            if (player["poste préféré"]?.toUpperCase().includes(posItem.type)) {
+              score += 100;
+            }
+            
+            // Ajouter les points du joueur
+            score += parseInt(player.points || 0);
+            
+            if (score > bestScore) {
+              bestScore = score;
+              bestPlayer = { player, index: i };
             }
           }
           
-          return null;
-        };
-        
-        // Assigner les gardiens en premier
-        if (positions.G.length > 0) {
-          const goalie = findBestPlayerForPosition("G", "center");
-          if (goalie) {
-            assignedPlayers.G.push({ ...goalie.player, penalty: goalie.penalty });
-            const index = availablePlayers.findIndex(p => p.id === goalie.player.id);
-            if (index !== -1) availablePlayers.splice(index, 1);
-          }
-        }
-        
-        // Assigner les défenseurs en fonction du côté
-        positions.D.forEach(pos => {
-          const defender = findBestPlayerForPosition("D", pos.side);
-          if (defender) {
-            assignedPlayers.D.push({ ...defender.player, penalty: defender.penalty, position: pos.side });
-            const index = availablePlayers.findIndex(p => p.id === defender.player.id);
-            if (index !== -1) availablePlayers.splice(index, 1);
-          }
-        });
-        
-        // Assigner les milieux
-        positions.M.forEach(pos => {
-          const midfielder = findBestPlayerForPosition("M", pos.side);
-          if (midfielder) {
-            assignedPlayers.M.push({ ...midfielder.player, penalty: midfielder.penalty, position: pos.side });
-            const index = availablePlayers.findIndex(p => p.id === midfielder.player.id);
-            if (index !== -1) availablePlayers.splice(index, 1);
-          }
-        });
-        
-        // Assigner les attaquants en fonction du côté
-        positions.A.forEach(pos => {
-          const attacker = findBestPlayerForPosition("A", pos.side);
-          if (attacker) {
-            assignedPlayers.A.push({ ...attacker.player, penalty: attacker.penalty, position: pos.side });
-            const index = availablePlayers.findIndex(p => p.id === attacker.player.id);
-            if (index !== -1) availablePlayers.splice(index, 1);
+          // Assigner le meilleur joueur trouvé à cette position
+          if (bestPlayer) {
+            assignedPlayers.push({
+              player: bestPlayer.player,
+              position: posItem.type,
+              coords: posItem.coords
+            });
+            availablePlayers.splice(bestPlayer.index, 1);
           }
         });
         
@@ -838,12 +851,7 @@
         const substitutes = [...availablePlayers];
         
         return {
-          titulaires: [
-            ...assignedPlayers.G,
-            ...assignedPlayers.D,
-            ...assignedPlayers.M,
-            ...assignedPlayers.A
-          ],
+          titulaires: assignedPlayers,
           substitutes
         };
       };
@@ -852,32 +860,12 @@
       const renderPitch = (team, teamName, teamClass) => {
         // Assigner les joueurs aux postes
         const { titulaires, substitutes } = assignPlayersToPositions(team, formation);
-        const positions = formationPositions[formation] || formationPositions["4-4-2"];
-        
-        // Calculer les points totaux avec pénalités
-        const totalPoints = titulaires.reduce((sum, player) => 
-          sum + parseInt(player.points || 0) - (player.penalty || 0), 0
-        );
-        
-        // Obtenir le prénom du joueur
-        const getPlayerFirstName = (fullName) => {
-          return fullName.split(' ')[0];
-        };
-        
-        // Obtenir l'icône pour le pied
-        const getFootIcon = (foot) => {
-          if (!foot) return "";
-          if (foot.toLowerCase().includes("droit")) return "D";
-          if (foot.toLowerCase().includes("gauche")) return "G";
-          if (foot.toLowerCase().includes("ambidextre")) return "A";
-          return "";
-        };
         
         return (
-          <div className="fade-in" style={{width: '100%', maxWidth: '500px'}}>
+          <div className="fade-in" style={{width: '100%', maxWidth: '700px'}}>
             <div className="team-title">
               <span>{teamName}</span>
-              <span className="badge level">{totalPoints} pts</span>
+              <span className="badge level">{team.length} joueurs</span>
               <span className="badge position">{formation}</span>
             </div>
             
@@ -890,132 +878,21 @@
               <div className="goal-area right"></div>
               
               {/* Placement des joueurs titulaires */}
-              {positions.G.map((posCoord, idx) => {
-                const player = titulaires.find(p => 
-                  p["poste préféré"]?.toUpperCase().includes("G")
-                ) || titulaires[idx];
-                if (!player) return null;
-                
-                const firstName = getPlayerFirstName(player.nom);
+              {titulaires.map((item, index) => {
+                const { player, coords } = item;
                 
                 return (
                   <div 
-                    key={`${teamName}-${player.id}`}
-                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''} goalkeeper`}
+                    key={`${teamName}-${player.id}-${index}`}
+                    className={`player-marker ${teamClass} ${item.position === "G" ? "goalkeeper" : ""}`}
                     style={{
-                      left: `${posCoord.x}%`,
-                      top: `${posCoord.y}%`,
+                      left: `${coords.x}%`,
+                      top: `${coords.y}%`,
                     }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'}`}
+                    title={`${player.nom} - Pied: ${player.pied || '?'}`}
                   >
-                    <div className="player-name">{firstName}</div>
-                    <div className="player-position">Gardien</div>
-                    <div className="player-foot">
-                      Pied: {player.pied || '?'} {getFootIcon(player.pied)}
-                    </div>
-                  </div>
-                );
-              })}
-              
-              {positions.D.map((posCoord, idx) => {
-                // Trouver le joueur assigné à cette position spécifique
-                const player = titulaires.find(p => 
-                  p.position === posCoord.side && 
-                  p["poste préféré"]?.toUpperCase().includes("D")
-                ) || titulaires.find(p => p["poste préféré"]?.toUpperCase().includes("D")) || titulaires[idx + 1];
-                
-                if (!player) return null;
-                
-                const firstName = getPlayerFirstName(player.nom);
-                const isPreferred = player["poste préféré"]?.toUpperCase().includes("D");
-                
-                return (
-                  <div 
-                    key={`${teamName}-${player.id}-${idx}`}
-                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''}`}
-                    style={{
-                      left: `${posCoord.x}%`,
-                      top: `${posCoord.y}%`,
-                    }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'}`}
-                  >
-                    <div className="player-name">{firstName}</div>
-                    <div className="player-position">
-                      {isPreferred ? "Défenseur" : "Adapté"} 
-                      {posCoord.side.includes("left") ? " (G)" : 
-                       posCoord.side.includes("right") ? " (D)" : ""}
-                    </div>
-                    <div className="player-foot">
-                      Pied: {player.pied || '?'} {getFootIcon(player.pied)}
-                    </div>
-                  </div>
-                );
-              })}
-              
-              {positions.M.map((posCoord, idx) => {
-                const player = titulaires.find(p => 
-                  p.position === posCoord.side && 
-                  p["poste préféré"]?.toUpperCase().includes("M")
-                ) || titulaires.find(p => p["poste préféré"]?.toUpperCase().includes("M")) || titulaires[idx + positions.D.length + 1];
-                
-                if (!player) return null;
-                
-                const firstName = getPlayerFirstName(player.nom);
-                const isPreferred = player["poste préféré"]?.toUpperCase().includes("M");
-                
-                return (
-                  <div 
-                    key={`${teamName}-${player.id}-${idx}`}
-                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''}`}
-                    style={{
-                      left: `${posCoord.x}%`,
-                      top: `${posCoord.y}%`,
-                    }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'}`}
-                  >
-                    <div className="player-name">{firstName}</div>
-                    <div className="player-position">
-                      {isPreferred ? "Milieu" : "Adapté"} 
-                      {posCoord.side.includes("left") ? " (G)" : 
-                       posCoord.side.includes("right") ? " (D)" : ""}
-                    </div>
-                    <div className="player-foot">
-                      Pied: {player.pied || '?'} {getFootIcon(player.pied)}
-                    </div>
-                  </div>
-                );
-              })}
-              
-              {positions.A.map((posCoord, idx) => {
-                const player = titulaires.find(p => 
-                  p.position === posCoord.side && 
-                  p["poste préféré"]?.toUpperCase().includes("A")
-                ) || titulaires.find(p => p["poste préféré"]?.toUpperCase().includes("A")) || titulaires[idx + positions.D.length + positions.M.length + 1];
-                
-                if (!player) return null;
-                
-                const firstName = getPlayerFirstName(player.nom);
-                const isPreferred = player["poste préféré"]?.toUpperCase().includes("A");
-                
-                return (
-                  <div 
-                    key={`${teamName}-${player.id}-${idx}`}
-                    className={`player-marker ${teamClass} ${player.penalty > 0 ? 'secondary' : ''}`}
-                    style={{
-                      left: `${posCoord.x}%`,
-                      top: `${posCoord.y}%`,
-                    }}
-                    title={`${player.nom} - ${player["poste préféré"] || '?'}`}
-                  >
-                    <div className="player-name">{firstName}</div>
-                    <div className="player-position">
-                      {isPreferred ? "Attaquant" : "Adapté"} 
-                      {posCoord.side.includes("left") ? " (G)" : 
-                       posCoord.side.includes("right") ? " (D)" : ""}
-                    </div>
-                    <div className="player-foot">
-                      Pied: {player.pied || '?'} {getFootIcon(player.pied)}
-                    </div>
+                    <div className="player-name">{player.nom}</div>
+                    <div className="player-foot">{player.pied || '?'}</div>
                   </div>
                 );
               })}
@@ -1024,20 +901,18 @@
             {/* Remplaçants */}
             {substitutes.length > 0 && (
               <div className="substitutes">
-                <div style={{width: '100%', textAlign: 'center', margin: '5px 0', fontSize: '14px', fontWeight: 'bold'}}>
+                <div style={{width: '100%', textAlign: 'center', margin: '10px 0', fontSize: '16px', fontWeight: 'bold'}}>
                   Remplaçants
                 </div>
                 {substitutes.slice(0, 3).map((player, idx) => {
-                  const firstName = getPlayerFirstName(player.nom);
                   return (
                     <div 
                       key={`sub-${teamName}-${player.id}-${idx}`}
                       className={`sub-player ${teamClass}`}
-                      title={`${player.nom} - ${player["poste préféré"] || '?'}`}
+                      title={`${player.nom} - Pied: ${player.pied || '?'}`}
                     >
-                      <div style={{fontWeight: 'bold'}}>{firstName}</div>
-                      <div>{player["poste préféré"] || '?'}</div>
-                      <div>Pied: {player.pied || '?'} {getFootIcon(player.pied)}</div>
+                      <div style={{fontWeight: 'bold'}}>{player.nom}</div>
+                      <div>{player.pied || '?'}</div>
                     </div>
                   );
                 })}
@@ -1051,6 +926,8 @@
         <>
           {isLoading ? (
             <div className="loading">Chargement des joueurs...</div>
+          ) : error ? (
+            <div className="error-message">{error}</div>
           ) : (
             <>
               {players.map(p => (
@@ -1074,6 +951,8 @@
                   </label>
                 </div>
               ))}
+              
+              {error && <div className="error-message">{error}</div>}
               
               <div className="pitch-container">
                 {teams[0].length > 0 && renderPitch(teams[0], "🟡 Équipe A", "team-a")}
@@ -1115,7 +994,7 @@
                     checked={allowPositionSwitch} 
                     onChange={togglePositionSwitch}
                   />
-                  <label htmlFor="positionSwitchInput">Permettre changement de poste (-10 pts)</label>
+                  <label htmlFor="positionSwitchInput">Permettre changement de poste</label>
                 </div>
                 
                 <button className="btn" onClick={generateTeams}>
