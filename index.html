@@ -780,41 +780,31 @@
             
             <div class="column-mapping">
                 <h3 class="instructions-title">Correspondance des colonnes</h3>
-                <p>Assurez-vous que les colonnes de votre Google Sheet correspondent :</p>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Prénom :</div>
-                    <input type="text" id="colFirstName" class="mapping-select" value="Prénom">
-                </div>
+                <p>Configuration automatique pour votre structure de données</p>
                 
                 <div class="mapping-row">
                     <div class="mapping-label">Nom :</div>
-                    <input type="text" id="colLastName" class="mapping-select" value="Nom">
+                    <input type="text" id="colLastName" class="mapping-select" value="nom" readonly>
                 </div>
                 
                 <div class="mapping-row">
                     <div class="mapping-label">Poste :</div>
-                    <input type="text" id="colPosition" class="mapping-select" value="Poste">
-                </div>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Postes acceptés :</div>
-                    <input type="text" id="colPreferredPositions" class="mapping-select" value="Postes acceptés">
+                    <input type="text" id="colPosition" class="mapping-select" value="poste préféré" readonly>
                 </div>
                 
                 <div class="mapping-row">
                     <div class="mapping-label">Pied fort :</div>
-                    <input type="text" id="colFoot" class="mapping-select" value="Pied fort">
+                    <input type="text" id="colFoot" class="mapping-select" value="pied" readonly>
                 </div>
                 
                 <div class="mapping-row">
                     <div class="mapping-label">Points :</div>
-                    <input type="text" id="colPoints" class="mapping-select" value="Points">
+                    <input type="text" id="colPoints" class="mapping-select" value="points" readonly>
                 </div>
                 
                 <div class="mapping-row">
                     <div class="mapping-label">Présent :</div>
-                    <input type="text" id="colPresent" class="mapping-select" value="Présent">
+                    <input type="text" id="colPresent" class="mapping-select" value="présent" readonly>
                 </div>
             </div>
             
@@ -959,15 +949,13 @@
         // Player data will be loaded from Google Sheets
         let players = [];
         
-        // Column mapping configuration
-        let columnMapping = {
-            firstName: "Prénom",
-            lastName: "Nom",
-            position: "Poste",
-            preferredPositions: "Postes acceptés",
-            foot: "Pied fort",
-            points: "Points",
-            present: "Présent"
+        // Column mapping configuration for your specific sheet
+        const columnMapping = {
+            lastName: "nom",
+            position: "poste préféré",
+            foot: "pied",
+            points: "points",
+            present: "présent"
         };
         
         // Tactics configuration with realistic positions
@@ -1087,15 +1075,6 @@
         const rawData = document.getElementById('rawData');
         const toggleDebug = document.getElementById('toggleDebug');
         
-        // Column mapping elements
-        const colFirstName = document.getElementById('colFirstName');
-        const colLastName = document.getElementById('colLastName');
-        const colPosition = document.getElementById('colPosition');
-        const colPreferredPositions = document.getElementById('colPreferredPositions');
-        const colFoot = document.getElementById('colFoot');
-        const colPoints = document.getElementById('colPoints');
-        const colPresent = document.getElementById('colPresent');
-        
         // Initialize the app
         function initApp() {
             // Add event listeners
@@ -1111,9 +1090,6 @@
             renderField('A', tacticsTeamA.value);
             renderField('B', tacticsTeamB.value);
             
-            // Load column mapping from localStorage
-            loadColumnMapping();
-            
             // Try to load saved URL from localStorage
             const savedUrl = localStorage.getItem('googleScriptUrl');
             if (savedUrl) {
@@ -1123,38 +1099,6 @@
                 // Load sample data if no saved connection
                 loadSampleData();
             }
-        }
-        
-        // Load column mapping from localStorage
-        function loadColumnMapping() {
-            const savedMapping = localStorage.getItem('columnMapping');
-            if (savedMapping) {
-                columnMapping = JSON.parse(savedMapping);
-                
-                // Update UI
-                colFirstName.value = columnMapping.firstName;
-                colLastName.value = columnMapping.lastName;
-                colPosition.value = columnMapping.position;
-                colPreferredPositions.value = columnMapping.preferredPositions;
-                colFoot.value = columnMapping.foot;
-                colPoints.value = columnMapping.points;
-                colPresent.value = columnMapping.present;
-            }
-        }
-        
-        // Save column mapping to localStorage
-        function saveColumnMapping() {
-            columnMapping = {
-                firstName: colFirstName.value,
-                lastName: colLastName.value,
-                position: colPosition.value,
-                preferredPositions: colPreferredPositions.value,
-                foot: colFoot.value,
-                points: colPoints.value,
-                present: colPresent.value
-            };
-            
-            localStorage.setItem('columnMapping', JSON.stringify(columnMapping));
         }
         
         // Show connection panel
@@ -1208,28 +1152,9 @@
         // Load sample data
         function loadSampleData() {
             players = [
-                { id: 1, firstName: "Lionel", lastName: "Messi", position: "AT", preferredPositions: ["AT", "MO"], foot: "Gauche", points: 95, present: true },
-                { id: 2, firstName: "Kylian", lastName: "Mbappé", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 92, present: true },
-                { id: 3, firstName: "Kevin", lastName: "De Bruyne", position: "MO", preferredPositions: ["MO", "MC"], foot: "Droit", points: 91, present: true },
-                { id: 4, firstName: "Virgil", lastName: "van Dijk", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 90, present: true },
-                { id: 5, firstName: "Thibaut", lastName: "Courtois", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 89, present: true },
-                { id: 6, firstName: "N'Golo", lastName: "Kanté", position: "MC", preferredPositions: ["MC", "MD"], foot: "Droit", points: 88, present: true },
-                { id: 7, firstName: "Joshua", lastName: "Kimmich", position: "MD", preferredPositions: ["MD", "MC"], foot: "Droit", points: 87, present: true },
-                { id: 8, firstName: "Ruben", lastName: "Dias", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 86, present: true },
-                { id: 9, firstName: "Trent", lastName: "Alexander-Arnold", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 85, present: true },
-                { id: 10, firstName: "Alphonso", lastName: "Davies", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 84, present: true },
-                { id: 11, firstName: "Karim", lastName: "Benzema", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 89, present: true },
-                { id: 12, firstName: "Luka", lastName: "Modrić", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 86, present: true },
-                { id: 13, firstName: "Erling", lastName: "Haaland", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 88, present: true },
-                { id: 14, firstName: "Achraf", lastName: "Hakimi", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 83, present: true },
-                { id: 15, firstName: "Marc-André", lastName: "ter Stegen", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 87, present: true },
-                { id: 16, firstName: "Marquinhos", lastName: "", position: "DC", preferredPositions: ["DC", "MD"], foot: "Droit", points: 85, present: true },
-                { id: 17, firstName: "Jude", lastName: "Bellingham", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 84, present: true },
-                { id: 18, firstName: "Theo", lastName: "Hernández", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 83, present: true },
-                { id: 19, firstName: "Rodri", lastName: "", position: "MD", preferredPositions: ["MD", "DC"], foot: "Droit", points: 86, present: true },
-                { id: 20, firstName: "Bernardo", lastName: "Silva", position: "MO", preferredPositions: ["MO", "MC"], foot: "Gauche", points: 85, present: true },
-                { id: 21, firstName: "Ederson", lastName: "", position: "GB", preferredPositions: ["GB"], foot: "Gauche", points: 86, present: true },
-                { id: 22, firstName: "Antonio", lastName: "Rüdiger", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 82, present: true }
+                { id: 1, lastName: "Jean Michel Bernard", position: "Gardien", foot: "Droitier", points: 23, present: true },
+                { id: 2, lastName: "Riffard Florian", position: "Milieu", foot: "Droitier", points: 32, present: true },
+                { id: 3, lastName: "Chanal Christophe", position: "Attaquant", foot: "Ambidextre", points: 38, present: true }
             ];
             
             renderPlayersList();
@@ -1248,9 +1173,6 @@
             
             // Save URL to localStorage
             localStorage.setItem('googleScriptUrl', scriptUrl);
-            
-            // Save column mapping
-            saveColumnMapping();
             
             loadingIndicator.style.display = 'block';
             updateConnectionStatus(false, "Connexion en cours...");
@@ -1294,15 +1216,39 @@
             const mappedPlayers = [];
             
             data.forEach((row, index) => {
+                // Map position names to standard codes
+                const positionMap = {
+                    "Gardien": "GB",
+                    "Défenseur": "DC",
+                    "Milieu": "MC",
+                    "Attaquant": "AT"
+                };
+                
+                const position = positionMap[row[columnMapping.position]] || row[columnMapping.position];
+                
+                // Handle presence value (TRUE/FALSE)
+                let present = false;
+                if (typeof row[columnMapping.present] === 'string') {
+                    present = row[columnMapping.present].toUpperCase() === 'TRUE';
+                } else {
+                    present = Boolean(row[columnMapping.present]);
+                }
+                
+                // Parse points as number
+                let points = 0;
+                if (typeof row[columnMapping.points] === 'number') {
+                    points = row[columnMapping.points];
+                } else if (typeof row[columnMapping.points] === 'string') {
+                    points = parseInt(row[columnMapping.points]) || 0;
+                }
+                
                 const player = {
                     id: index + 1,
-                    firstName: row[columnMapping.firstName] || "",
                     lastName: row[columnMapping.lastName] || "",
-                    position: row[columnMapping.position] || "",
-                    preferredPositions: (row[columnMapping.preferredPositions] || "").split(';').map(p => p.trim()),
+                    position: position,
                     foot: row[columnMapping.foot] || "",
-                    points: parseInt(row[columnMapping.points] || 0),
-                    present: (row[columnMapping.present] || "").toString().toLowerCase() === 'oui'
+                    points: points,
+                    present: present
                 };
                 
                 mappedPlayers.push(player);
@@ -1334,7 +1280,7 @@
             card.dataset.points = player.points;
             
             card.innerHTML = `
-                <div class="player-name">${player.firstName} ${player.lastName}</div>
+                <div class="player-name">${player.lastName}</div>
                 <div class="player-position">${getPositionName(player.position)}</div>
                 <div class="player-stats">
                     <span class="foot-pref"><i class="fas fa-shoe-prints"></i> ${player.foot}</span>
