@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESLM - Composition d'Équipes</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <style>
         :root {
             --primary-color: #000000;
@@ -13,6 +14,8 @@
             --text-color: #FFFFFF;
             --field-color: #2E8B57;
             --substitute-color: #1E5A3A;
+            --goal-color: #C0C0C0;
+            --line-color: #FFFFFF;
         }
         
         * {
@@ -85,7 +88,7 @@
             flex-wrap: wrap;
         }
         
-        .btn-generate {
+        .btn {
             background: var(--secondary-color);
             color: var(--primary-color);
             border: none;
@@ -98,14 +101,22 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .btn-generate:hover {
+        .btn:hover {
             background: #ffc800;
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
         }
         
-        .btn-generate:active {
+        .btn:active {
             transform: translateY(0);
+        }
+        
+        .btn-generate {
+            background: #4CAF50;
+        }
+        
+        .btn-generate:hover {
+            background: #45a049;
         }
         
         /* Tactics Selector */
@@ -194,16 +205,39 @@
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
         }
         
-        .field-lines {
+        .football-field {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: var(--field-color);
             background-image: 
-                linear-gradient(to bottom, transparent 49%, white 49%, white 51%, transparent 51%),
-                linear-gradient(to right, transparent 49%, white 49%, white 51%, transparent 51%),
-                radial-gradient(circle at 50% 50%, transparent 0%, transparent 20%, white 20%, white 21%, transparent 21%);
+                /* Grand rectangle */
+                linear-gradient(to right, transparent 10%, var(--line-color) 10%, var(--line-color) 90%, transparent 90%),
+                linear-gradient(to bottom, transparent 10%, var(--line-color) 10%, var(--line-color) 90%, transparent 90%),
+                
+                /* Cercle central */
+                radial-gradient(circle at 50% 50%, transparent 0%, transparent 12%, var(--line-color) 12%, var(--line-color) 12.5%, transparent 12.5%),
+                
+                /* Demi-cercle milieu */
+                radial-gradient(circle at 50% 10%, transparent 0%, transparent 12%, var(--line-color) 12%, var(--line-color) 12.5%, transparent 12.5%),
+                radial-gradient(circle at 50% 90%, transparent 0%, transparent 12%, var(--line-color) 12%, var(--line-color) 12.5%, transparent 12.5%),
+                
+                /* Surface de réparation gauche */
+                linear-gradient(to right, transparent 10%, var(--line-color) 10%, var(--line-color) 10.5%, transparent 10.5%),
+                linear-gradient(to right, transparent 10%, var(--line-color) 10%, var(--line-color) 10.5%, transparent 10.5%),
+                linear-gradient(to bottom, transparent 25%, var(--line-color) 25%, var(--line-color) 75%, transparent 75%),
+                
+                /* Surface de réparation droite */
+                linear-gradient(to right, transparent 90%, var(--line-color) 90%, var(--line-color) 90.5%, transparent 90.5%),
+                linear-gradient(to bottom, transparent 25%, var(--line-color) 25%, var(--line-color) 75%, transparent 75%),
+                
+                /* Buts */
+                linear-gradient(to right, transparent 9.5%, var(--goal-color) 9.5%, var(--goal-color) 10.5%, transparent 10.5%),
+                linear-gradient(to right, transparent 89.5%, var(--goal-color) 89.5%, var(--goal-color) 90.5%, transparent 90.5%);
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
             opacity: 0.3;
         }
         
@@ -223,6 +257,14 @@
             justify-content: center;
             align-items: center;
             position: relative;
+        }
+        
+        .position-label {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.7rem;
+            font-weight: bold;
+            bottom: -15px;
         }
         
         /* Substitute Section */
@@ -364,6 +406,48 @@
             justify-content: center;
         }
         
+        /* Sheet Connection */
+        .sheet-connection {
+            background: rgba(40, 40, 40, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .sheet-connection h2 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .sheet-input {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .sheet-input input {
+            padding: 10px 15px;
+            border-radius: 30px;
+            border: 2px solid var(--secondary-color);
+            background: var(--primary-color);
+            color: var(--text-color);
+            min-width: 400px;
+            font-size: 1rem;
+        }
+        
+        .instructions {
+            background: rgba(50, 50, 50, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+        
         /* Responsive */
         @media (max-width: 1200px) {
             .teams-container {
@@ -392,19 +476,47 @@
             .club-name {
                 font-size: 2rem;
             }
-        }
-        
-        .position-label {
-            position: absolute;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 0.7rem;
-            font-weight: bold;
+            
+            .sheet-input input {
+                min-width: 250px;
+            }
         }
         
         .dragging {
             opacity: 0.7;
             transform: scale(1.05);
             box-shadow: 0 0 20px var(--secondary-color);
+        }
+        
+        .dropzone {
+            min-height: 50px;
+            border: 2px dashed var(--secondary-color);
+            border-radius: 8px;
+            margin: 10px 0;
+            padding: 10px;
+            transition: all 0.3s;
+        }
+        
+        .dropzone.active {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffc800;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+        
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -441,11 +553,31 @@
                     </select>
                 </div>
                 
-                <button id="generateBtn" class="btn-generate">
+                <button id="generateBtn" class="btn btn-generate">
                     <i class="fas fa-cogs"></i> Générer les équipes
                 </button>
             </div>
         </header>
+        
+        <!-- Sheet Connection Section -->
+        <section class="sheet-connection">
+            <h2>Connexion à Google Sheets</h2>
+            <div class="sheet-input">
+                <input type="text" id="sheetUrl" placeholder="Collez l'URL de votre Google Sheet ici" value="https://docs.google.com/spreadsheets/d/1fZ73GlGUmzKEAaVvqnQt5z1qJmjH_H2v8rZrY4rBwWg/edit?usp=sharing">
+                <button id="loadSheetBtn" class="btn">
+                    <i class="fas fa-sync"></i> Charger les données
+                </button>
+            </div>
+            <div class="instructions">
+                <p><strong>Instructions :</strong></p>
+                <p>1. Votre Google Sheet doit être configuré avec les colonnes suivantes : Prénom, Nom, Poste, Postes acceptés, Pied fort, Points, Présent</p>
+                <p>2. Le fichier doit être partagé publiquement (Fichier > Partager > Partager avec tous)</p>
+                <p>3. Collez l'URL complète de votre Google Sheet ci-dessus et cliquez sur "Charger les données"</p>
+            </div>
+            <div id="loadingIndicator" class="loading">
+                <i class="fas fa-spinner"></i> Chargement des données depuis Google Sheets...
+            </div>
+        </section>
         
         <div class="teams-container">
             <!-- Team A Section -->
@@ -453,21 +585,23 @@
                 <div class="team-header">
                     <h2 class="team-title">Équipe A</h2>
                     <div class="team-stats">
-                        <span>Total: 84 pts</span>
-                        <span>Moy: 7.6</span>
+                        <span>Total: <span id="teamA-total">0</span> pts</span>
+                        <span>Moy: <span id="teamA-avg">0.0</span></span>
                     </div>
                 </div>
                 
                 <div class="field-container">
-                    <div class="field-lines"></div>
+                    <div class="football-field"></div>
                     <div class="field-positions" id="field-teamA">
                         <!-- Positions will be generated by JS based on tactics -->
                     </div>
                 </div>
                 
                 <div class="substitutes">
-                    <div class="sub-title">Remplaçants (3)</div>
-                    <!-- Substitute players will be added here by JS -->
+                    <div class="sub-title">Remplaçants (<span id="subsA-count">0</span>)</div>
+                    <div class="dropzone" id="subs-teamA">
+                        <!-- Substitute players will be added here by JS -->
+                    </div>
                 </div>
             </section>
             
@@ -476,36 +610,38 @@
                 <div class="team-header">
                     <h2 class="team-title">Équipe B</h2>
                     <div class="team-stats">
-                        <span>Total: 76 pts</span>
-                        <span>Moy: 6.9</span>
+                        <span>Total: <span id="teamB-total">0</span> pts</span>
+                        <span>Moy: <span id="teamB-avg">0.0</span></span>
                     </div>
                 </div>
                 
                 <div class="field-container">
-                    <div class="field-lines"></div>
+                    <div class="football-field"></div>
                     <div class="field-positions" id="field-teamB">
                         <!-- Positions will be generated by JS based on tactics -->
                     </div>
                 </div>
                 
                 <div class="substitutes">
-                    <div class="sub-title">Remplaçants (3)</div>
-                    <!-- Substitute players will be added here by JS -->
+                    <div class="sub-title">Remplaçants (<span id="subsB-count">0</span>)</div>
+                    <div class="dropzone" id="subs-teamB">
+                        <!-- Substitute players will be added here by JS -->
+                    </div>
                 </div>
             </section>
         </div>
         
         <!-- Excluded Players Section -->
         <section class="excluded-section">
-            <h2 class="excluded-title">Joueurs Écartés (2)</h2>
-            <div class="excluded-container" id="excluded-players">
+            <h2 class="excluded-title">Joueurs Écartés (<span id="excluded-count">0</span>)</h2>
+            <div class="excluded-container dropzone" id="excluded-players">
                 <!-- Excluded players will be added here by JS -->
             </div>
         </section>
         
         <!-- Players List Section -->
         <section class="players-list">
-            <h2 class="players-title">Liste des Joueurs (22 présents)</h2>
+            <h2 class="players-title">Liste des Joueurs (<span id="players-count">0</span> présents)</h2>
             <div class="players-container" id="players-container">
                 <!-- Players list will be populated by JS -->
             </div>
@@ -513,124 +649,99 @@
     </div>
 
     <script>
-        // Sample player data - in a real app, this would come from your Google Sheet
-        const players = [
-            { id: 1, firstName: "Lionel", lastName: "Messi", position: "AT", preferredPositions: ["AT", "MO"], foot: "Gauche", points: 95, present: true },
-            { id: 2, firstName: "Kylian", lastName: "Mbappé", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 92, present: true },
-            { id: 3, firstName: "Kevin", lastName: "De Bruyne", position: "MO", preferredPositions: ["MO", "MC"], foot: "Droit", points: 91, present: true },
-            { id: 4, firstName: "Virgil", lastName: "van Dijk", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 90, present: true },
-            { id: 5, firstName: "Thibaut", lastName: "Courtois", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 89, present: true },
-            { id: 6, firstName: "N'Golo", lastName: "Kanté", position: "MC", preferredPositions: ["MC", "MD"], foot: "Droit", points: 88, present: true },
-            { id: 7, firstName: "Joshua", lastName: "Kimmich", position: "MD", preferredPositions: ["MD", "MC"], foot: "Droit", points: 87, present: true },
-            { id: 8, firstName: "Ruben", lastName: "Dias", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 86, present: true },
-            { id: 9, firstName: "Trent", lastName: "Alexander-Arnold", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 85, present: true },
-            { id: 10, firstName: "Alphonso", lastName: "Davies", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 84, present: true },
-            { id: 11, firstName: "Karim", lastName: "Benzema", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 89, present: true },
-            { id: 12, firstName: "Luka", lastName: "Modrić", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 86, present: true },
-            { id: 13, firstName: "Erling", lastName: "Haaland", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 88, present: true },
-            { id: 14, firstName: "Achraf", lastName: "Hakimi", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 83, present: true },
-            { id: 15, firstName: "Marc-André", lastName: "ter Stegen", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 87, present: true },
-            { id: 16, firstName: "Marquinhos", lastName: "", position: "DC", preferredPositions: ["DC", "MD"], foot: "Droit", points: 85, present: true },
-            { id: 17, firstName: "Jude", lastName: "Bellingham", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 84, present: true },
-            { id: 18, firstName: "Theo", lastName: "Hernández", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 83, present: true },
-            { id: 19, firstName: "Rodri", lastName: "", position: "MD", preferredPositions: ["MD", "DC"], foot: "Droit", points: 86, present: true },
-            { id: 20, firstName: "Bernardo", lastName: "Silva", position: "MO", preferredPositions: ["MO", "MC"], foot: "Gauche", points: 85, present: true },
-            { id: 21, firstName: "Ederson", lastName: "", position: "GB", preferredPositions: ["GB"], foot: "Gauche", points: 86, present: true },
-            { id: 22, firstName: "Antonio", lastName: "Rüdiger", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 82, present: true },
-            { id: 23, firstName: "Raphaël", lastName: "Varane", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 83, present: false },
-            { id: 24, firstName: "Paul", lastName: "Pogba", position: "MC", preferredPositions: ["MC", "MD"], foot: "Droit", points: 84, present: false }
-        ];
-
-        // Tactics configuration
+        // Player data will be loaded from Google Sheets
+        let players = [];
+        
+        // Tactics configuration with realistic positions
         const tacticsConfig = {
             "4-4-2": {
                 positions: [
-                    { role: "GB", gridArea: "5/3/6/4" },
-                    { role: "LD", gridArea: "4/1/5/2" },
-                    { role: "DC", gridArea: "4/2/5/3" },
-                    { role: "DC", gridArea: "4/3/5/4" },
-                    { role: "LG", gridArea: "4/4/5/5" },
-                    { role: "MD", gridArea: "3/1/4/2" },
-                    { role: "MC", gridArea: "3/2/4/3" },
-                    { role: "MC", gridArea: "3/3/4/4" },
-                    { role: "MG", gridArea: "3/4/4/5" },
-                    { role: "AT", gridArea: "2/2/3/3" },
-                    { role: "AT", gridArea: "2/3/3/4" }
+                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
+                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
+                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
+                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
+                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
+                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
+                    { role: "MC", gridArea: "3/3/4/4", label: "Mil. Centre" },
+                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
+                    { role: "AT", gridArea: "2/2/3/3", label: "Attaquant" },
+                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
                 ]
             },
             "4-3-3": {
                 positions: [
-                    { role: "GB", gridArea: "5/3/6/4" },
-                    { role: "LD", gridArea: "4/1/5/2" },
-                    { role: "DC", gridArea: "4/2/5/3" },
-                    { role: "DC", gridArea: "4/3/5/4" },
-                    { role: "LG", gridArea: "4/4/5/5" },
-                    { role: "MC", gridArea: "3/2/4/3" },
-                    { role: "MD", gridArea: "3/1/4/2" },
-                    { role: "MO", gridArea: "3/3/4/4" },
-                    { role: "AD", gridArea: "2/1/3/2" },
-                    { role: "AT", gridArea: "2/3/3/4" },
-                    { role: "AG", gridArea: "2/4/3/5" }
+                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
+                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
+                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
+                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
+                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
+                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Déf" },
+                    { role: "MO", gridArea: "3/3/4/4", label: "Mil. Off" },
+                    { role: "AD", gridArea: "2/1/3/2", label: "Ail. Droit" },
+                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" },
+                    { role: "AG", gridArea: "2/4/3/5", label: "Ail. Gauche" }
                 ]
             },
             "3-5-2": {
                 positions: [
-                    { role: "GB", gridArea: "5/3/6/4" },
-                    { role: "DC", gridArea: "4/1/5/2" },
-                    { role: "DC", gridArea: "4/2/5/3" },
-                    { role: "DC", gridArea: "4/3/5/4" },
-                    { role: "MD", gridArea: "3/1/4/2" },
-                    { role: "MC", gridArea: "3/2/4/3" },
-                    { role: "MC", gridArea: "3/3/4/4" },
-                    { role: "MG", gridArea: "3/4/4/5" },
-                    { role: "MO", gridArea: "2/2/3/3" },
-                    { role: "AT", gridArea: "2/1/3/2" },
-                    { role: "AT", gridArea: "2/3/3/4" }
+                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
+                    { role: "DC", gridArea: "4/1/5/2", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
+                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
+                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
+                    { role: "MC", gridArea: "3/3/4/4", label: "Mil. Centre" },
+                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
+                    { role: "MO", gridArea: "2/2/3/3", label: "Mil. Off" },
+                    { role: "AT", gridArea: "2/1/3/2", label: "Attaquant" },
+                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
                 ]
             },
             "4-5-1": {
                 positions: [
-                    { role: "GB", gridArea: "5/3/6/4" },
-                    { role: "LD", gridArea: "4/1/5/2" },
-                    { role: "DC", gridArea: "4/2/5/3" },
-                    { role: "DC", gridArea: "4/3/5/4" },
-                    { role: "LG", gridArea: "4/4/5/5" },
-                    { role: "MD", gridArea: "3/1/4/2" },
-                    { role: "MC", gridArea: "3/2/4/3" },
-                    { role: "MC", gridArea: "3/3/4/4" },
-                    { role: "MG", gridArea: "3/4/4/5" },
-                    { role: "MO", gridArea: "2/2/3/3" },
-                    { role: "AT", gridArea: "2/3/3/4" }
+                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
+                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
+                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
+                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
+                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
+                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
+                    { role: "MC", gridArea: "3/3/4/4", label: "Mil. Centre" },
+                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
+                    { role: "MO", gridArea: "2/2/3/3", label: "Mil. Off" },
+                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
                 ]
             },
             "4-2-3-1": {
                 positions: [
-                    { role: "GB", gridArea: "5/3/6/4" },
-                    { role: "LD", gridArea: "4/1/5/2" },
-                    { role: "DC", gridArea: "4/2/5/3" },
-                    { role: "DC", gridArea: "4/3/5/4" },
-                    { role: "LG", gridArea: "4/4/5/5" },
-                    { role: "MD", gridArea: "3/2/4/3" },
-                    { role: "MD", gridArea: "3/3/4/4" },
-                    { role: "MO", gridArea: "2/1/3/2" },
-                    { role: "MO", gridArea: "2/3/3/4" },
-                    { role: "MO", gridArea: "2/4/3/5" },
-                    { role: "AT", gridArea: "1/3/2/4" }
+                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
+                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
+                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
+                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
+                    { role: "MD", gridArea: "3/2/4/3", label: "Mil. Déf" },
+                    { role: "MD", gridArea: "3/3/4/4", label: "Mil. Déf" },
+                    { role: "MO", gridArea: "2/1/3/2", label: "Mil. Off D" },
+                    { role: "MO", gridArea: "2/3/3/4", label: "Mil. Off C" },
+                    { role: "MO", gridArea: "2/4/3/5", label: "Mil. Off G" },
+                    { role: "AT", gridArea: "1/3/2/4", label: "Attaquant" }
                 ]
             },
             "5-3-2": {
                 positions: [
-                    { role: "GB", gridArea: "5/3/6/4" },
-                    { role: "LD", gridArea: "4/1/5/2" },
-                    { role: "DC", gridArea: "4/2/5/3" },
-                    { role: "DC", gridArea: "4/3/5/4" },
-                    { role: "LG", gridArea: "4/4/5/5" },
-                    { role: "MD", gridArea: "3/1/4/2" },
-                    { role: "MC", gridArea: "3/2/4/3" },
-                    { role: "MG", gridArea: "3/4/4/5" },
-                    { role: "MO", gridArea: "2/2/3/3" },
-                    { role: "AT", gridArea: "2/1/3/2" },
-                    { role: "AT", gridArea: "2/3/3/4" }
+                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
+                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
+                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
+                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
+                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
+                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
+                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
+                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
+                    { role: "MO", gridArea: "2/2/3/3", label: "Mil. Off" },
+                    { role: "AT", gridArea: "2/1/3/2", label: "Attaquant" },
+                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
                 ]
             }
         };
@@ -643,38 +754,134 @@
         const fieldTeamB = document.getElementById('field-teamB');
         const playersContainer = document.getElementById('players-container');
         const excludedPlayers = document.getElementById('excluded-players');
-
+        const loadSheetBtn = document.getElementById('loadSheetBtn');
+        const sheetUrlInput = document.getElementById('sheetUrl');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        
         // Initialize the app
         function initApp() {
-            renderPlayersList();
-            generateTeams();
-            
             // Add event listeners
             generateBtn.addEventListener('click', generateTeams);
             tacticsTeamA.addEventListener('change', () => renderField('A', tacticsTeamA.value));
             tacticsTeamB.addEventListener('change', () => renderField('B', tacticsTeamB.value));
+            loadSheetBtn.addEventListener('click', loadSheetData);
             
             // Initialize fields
             renderField('A', tacticsTeamA.value);
             renderField('B', tacticsTeamB.value);
+            
+            // Load sample data if no data is present
+            if(players.length === 0) {
+                loadSampleData();
+            }
         }
-
+        
+        // Load sample data
+        function loadSampleData() {
+            players = [
+                { id: 1, firstName: "Lionel", lastName: "Messi", position: "AT", preferredPositions: ["AT", "MO"], foot: "Gauche", points: 95, present: true },
+                { id: 2, firstName: "Kylian", lastName: "Mbappé", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 92, present: true },
+                { id: 3, firstName: "Kevin", lastName: "De Bruyne", position: "MO", preferredPositions: ["MO", "MC"], foot: "Droit", points: 91, present: true },
+                { id: 4, firstName: "Virgil", lastName: "van Dijk", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 90, present: true },
+                { id: 5, firstName: "Thibaut", lastName: "Courtois", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 89, present: true },
+                { id: 6, firstName: "N'Golo", lastName: "Kanté", position: "MC", preferredPositions: ["MC", "MD"], foot: "Droit", points: 88, present: true },
+                { id: 7, firstName: "Joshua", lastName: "Kimmich", position: "MD", preferredPositions: ["MD", "MC"], foot: "Droit", points: 87, present: true },
+                { id: 8, firstName: "Ruben", lastName: "Dias", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 86, present: true },
+                { id: 9, firstName: "Trent", lastName: "Alexander-Arnold", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 85, present: true },
+                { id: 10, firstName: "Alphonso", lastName: "Davies", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 84, present: true },
+                { id: 11, firstName: "Karim", lastName: "Benzema", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 89, present: true },
+                { id: 12, firstName: "Luka", lastName: "Modrić", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 86, present: true },
+                { id: 13, firstName: "Erling", lastName: "Haaland", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 88, present: true },
+                { id: 14, firstName: "Achraf", lastName: "Hakimi", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 83, present: true },
+                { id: 15, firstName: "Marc-André", lastName: "ter Stegen", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 87, present: true },
+                { id: 16, firstName: "Marquinhos", lastName: "", position: "DC", preferredPositions: ["DC", "MD"], foot: "Droit", points: 85, present: true },
+                { id: 17, firstName: "Jude", lastName: "Bellingham", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 84, present: true },
+                { id: 18, firstName: "Theo", lastName: "Hernández", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 83, present: true },
+                { id: 19, firstName: "Rodri", lastName: "", position: "MD", preferredPositions: ["MD", "DC"], foot: "Droit", points: 86, present: true },
+                { id: 20, firstName: "Bernardo", lastName: "Silva", position: "MO", preferredPositions: ["MO", "MC"], foot: "Gauche", points: 85, present: true },
+                { id: 21, firstName: "Ederson", lastName: "", position: "GB", preferredPositions: ["GB"], foot: "Gauche", points: 86, present: true },
+                { id: 22, firstName: "Antonio", lastName: "Rüdiger", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 82, present: true }
+            ];
+            
+            renderPlayersList();
+            generateTeams();
+        }
+        
+        // Load data from Google Sheet
+        function loadSheetData() {
+            const sheetUrl = sheetUrlInput.value.trim();
+            if (!sheetUrl) {
+                alert("Veuillez entrer une URL Google Sheet valide");
+                return;
+            }
+            
+            // Convert Google Sheet URL to CSV export URL
+            const match = sheetUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if (!match || !match[1]) {
+                alert("URL Google Sheet non valide");
+                return;
+            }
+            
+            const sheetId = match[1];
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+            
+            loadingIndicator.style.display = 'block';
+            
+            // Fetch CSV data
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(csvData => {
+                    // Parse CSV data
+                    const parsedData = Papa.parse(csvData, {
+                        header: true,
+                        skipEmptyLines: true
+                    });
+                    
+                    players = parsedData.data.map((row, index) => {
+                        return {
+                            id: index + 1,
+                            firstName: row["Prénom"] || "",
+                            lastName: row["Nom"] || "",
+                            position: row["Poste"] || "",
+                            preferredPositions: (row["Postes acceptés"] || "").split(';').map(p => p.trim()),
+                            foot: row["Pied fort"] || "",
+                            points: parseInt(row["Points"] || 0),
+                            present: (row["Présent"] || "").toLowerCase() === 'oui'
+                        };
+                    });
+                    
+                    renderPlayersList();
+                    generateTeams();
+                    loadingIndicator.style.display = 'none';
+                })
+                .catch(error => {
+                    console.error("Error loading Google Sheet:", error);
+                    alert("Erreur lors du chargement des données. Veuillez vérifier que le fichier est public.");
+                    loadingIndicator.style.display = 'none';
+                });
+        }
+        
         // Render players list
         function renderPlayersList() {
             playersContainer.innerHTML = '';
             
-            players.filter(player => player.present).forEach(player => {
+            const presentPlayers = players.filter(player => player.present);
+            document.getElementById('players-count').textContent = presentPlayers.length;
+            
+            presentPlayers.forEach(player => {
                 const playerCard = createPlayerCard(player);
                 playersContainer.appendChild(playerCard);
             });
         }
-
+        
         // Create player card element
         function createPlayerCard(player) {
             const card = document.createElement('div');
             card.className = 'player-card';
             card.draggable = true;
             card.dataset.id = player.id;
+            card.dataset.position = player.position;
+            card.dataset.points = player.points;
             
             card.innerHTML = `
                 <div class="player-name">${player.firstName} ${player.lastName}</div>
@@ -691,18 +898,28 @@
             
             return card;
         }
-
+        
         // Handle drag start
         function handleDragStart(e) {
             e.dataTransfer.setData('text/plain', e.target.dataset.id);
             e.target.classList.add('dragging');
+            
+            // Add dropzone highlighting
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                dz.classList.add('active');
+            });
         }
-
+        
         // Handle drag end
         function handleDragEnd(e) {
             e.target.classList.remove('dragging');
+            
+            // Remove dropzone highlighting
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                dz.classList.remove('active');
+            });
         }
-
+        
         // Get position name from abbreviation
         function getPositionName(abbr) {
             const positions = {
@@ -720,7 +937,7 @@
             };
             return positions[abbr] || abbr;
         }
-
+        
         // Render football field positions
         function renderField(team, tactic) {
             const field = team === 'A' ? fieldTeamA : fieldTeamB;
@@ -736,44 +953,88 @@
                 
                 // Add drop zone
                 positionEl.addEventListener('dragover', handleDragOver);
-                positionEl.addEventListener('drop', handleDrop);
+                positionEl.addEventListener('drop', (e) => handleDrop(e, positionEl));
                 
                 const label = document.createElement('div');
                 label.className = 'position-label';
-                label.textContent = getPositionName(pos.role);
+                label.textContent = pos.label;
                 positionEl.appendChild(label);
                 
                 field.appendChild(positionEl);
             });
         }
-
+        
         // Handle drag over
         function handleDragOver(e) {
             e.preventDefault();
         }
-
+        
         // Handle drop
-        function handleDrop(e) {
+        function handleDrop(e, target) {
             e.preventDefault();
             const playerId = e.dataTransfer.getData('text/plain');
             const playerCard = document.querySelector(`.player-card[data-id="${playerId}"]`);
             
-            if (playerCard) {
-                e.target.appendChild(playerCard.cloneNode(true));
+            if (playerCard && target) {
+                // Remove player from previous position
+                const previousParent = playerCard.parentElement;
+                if (previousParent) {
+                    previousParent.removeChild(playerCard);
+                }
+                
+                // Add player to new position
+                target.appendChild(playerCard);
+                
+                // Update team stats
+                updateTeamStats();
             }
         }
-
+        
+        // Update team statistics
+        function updateTeamStats() {
+            // Team A
+            const teamAPlayers = Array.from(fieldTeamA.querySelectorAll('.player-card')).map(card => {
+                return players.find(p => p.id.toString() === card.dataset.id);
+            });
+            
+            const teamATotal = teamAPlayers.reduce((sum, player) => sum + (player?.points || 0), 0);
+            const teamAAvg = teamAPlayers.length > 0 ? (teamATotal / teamAPlayers.length).toFixed(1) : 0;
+            
+            document.getElementById('teamA-total').textContent = teamATotal;
+            document.getElementById('teamA-avg').textContent = teamAAvg;
+            
+            // Team B
+            const teamBPlayers = Array.from(fieldTeamB.querySelectorAll('.player-card')).map(card => {
+                return players.find(p => p.id.toString() === card.dataset.id);
+            });
+            
+            const teamBTotal = teamBPlayers.reduce((sum, player) => sum + (player?.points || 0), 0);
+            const teamBAvg = teamBPlayers.length > 0 ? (teamBTotal / teamBPlayers.length).toFixed(1) : 0;
+            
+            document.getElementById('teamB-total').textContent = teamBTotal;
+            document.getElementById('teamB-avg').textContent = teamBAvg;
+            
+            // Update substitutes counts
+            const subsA = document.getElementById('subs-teamA').querySelectorAll('.player-card').length;
+            const subsB = document.getElementById('subs-teamB').querySelectorAll('.player-card').length;
+            
+            document.getElementById('subsA-count').textContent = subsA;
+            document.getElementById('subsB-count').textContent = subsB;
+            
+            // Update excluded count
+            const excluded = document.getElementById('excluded-players').querySelectorAll('.player-card').length;
+            document.getElementById('excluded-count').textContent = excluded;
+        }
+        
         // Generate teams based on tactics
         function generateTeams() {
             const tacticA = tacticsTeamA.value;
             const tacticB = tacticsTeamB.value;
             
             // Clear previous teams
-            document.querySelectorAll('.team-section .substitutes').forEach(sub => {
-                sub.innerHTML = '<div class="sub-title">Remplaçants</div>';
+            document.querySelectorAll('.dropzone').forEach(dz => {
+                dz.innerHTML = '';
             });
-            
-            excludedPlayers.innerHTML = '';
             
             // Filter present players and sort by points
             const presentPlayers = players.filter(player => player.present);
@@ -789,8 +1050,8 @@
             renderPlayersOnField('B', tacticB, teamBPlayers);
             
             // Add substitutes
-            addSubstitutes('A', teamAPlayers.slice(0, 3));
-            addSubstitutes('B', teamBPlayers.slice(0, 3));
+            addSubstitutes('A', sortedPlayers.slice(11, 14));
+            addSubstitutes('B', sortedPlayers.slice(14, 17));
             
             // Add excluded players
             excluded.forEach(player => {
@@ -798,11 +1059,10 @@
                 excludedPlayers.appendChild(playerCard);
             });
             
-            // Update excluded title
-            document.querySelector('.excluded-title').textContent = 
-                `Joueurs Écartés (${excluded.length})`;
+            // Update stats
+            updateTeamStats();
         }
-
+        
         // Render players on field
         function renderPlayersOnField(team, tactic, players) {
             const field = team === 'A' ? fieldTeamA : fieldTeamB;
@@ -823,21 +1083,17 @@
                 }
             });
         }
-
+        
         // Add substitutes to team
         function addSubstitutes(team, substitutes) {
-            const subContainer = document.querySelectorAll('.team-section .substitutes')[team === 'A' ? 0 : 1];
+            const subContainer = document.getElementById(`subs-team${team}`);
             
             substitutes.forEach(player => {
                 const playerCard = createPlayerCard(player);
                 subContainer.appendChild(playerCard);
             });
-            
-            // Update subtitle
-            const subTitle = subContainer.querySelector('.sub-title');
-            subTitle.textContent = `Remplaçants (${substitutes.length})`;
         }
-
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
