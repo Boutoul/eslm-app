@@ -147,6 +147,16 @@
             background: #3367d6;
         }
         
+        .btn-debug {
+            background: #9C27B0;
+            padding: 8px 15px;
+            font-size: 1rem;
+        }
+        
+        .btn-debug:hover {
+            background: #7B1FA2;
+        }
+        
         /* Tactics Selector */
         .tactics-selector {
             display: flex;
@@ -655,6 +665,65 @@
             width: 10px;
             height: 10px;
         }
+        
+        .column-mapping {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(50, 50, 50, 0.8);
+            border-radius: 10px;
+        }
+        
+        .mapping-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(40, 40, 40, 0.6);
+            border-radius: 8px;
+        }
+        
+        .mapping-label {
+            width: 150px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .mapping-select {
+            flex: 1;
+            padding: 8px;
+            border-radius: 5px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: 1px solid var(--secondary-color);
+        }
+        
+        .debug-panel {
+            background: rgba(30, 30, 30, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            border: 1px solid var(--secondary-color);
+        }
+        
+        .debug-title {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .error-message {
+            color: var(--error-color);
+            padding: 10px;
+            background: rgba(100, 0, 0, 0.3);
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -680,8 +749,9 @@
             <div class="script-code">function doGet() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Joueurs");
   if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({ error: "Feuille 'Joueurs' introuvable" }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({ 
+      error: "Feuille 'Joueurs' introuvable. Vérifiez le nom de la feuille." 
+    })).setMimeType(ContentService.MimeType.JSON);
   }
   
   const data = sheet.getDataRange().getValues();
@@ -708,8 +778,59 @@
                 <input type="text" id="scriptUrl" placeholder="URL de déploiement" style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid var(--secondary-color);">
             </div>
             
+            <div class="column-mapping">
+                <h3 class="instructions-title">Correspondance des colonnes</h3>
+                <p>Assurez-vous que les colonnes de votre Google Sheet correspondent :</p>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Prénom :</div>
+                    <input type="text" id="colFirstName" class="mapping-select" value="Prénom">
+                </div>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Nom :</div>
+                    <input type="text" id="colLastName" class="mapping-select" value="Nom">
+                </div>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Poste :</div>
+                    <input type="text" id="colPosition" class="mapping-select" value="Poste">
+                </div>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Postes acceptés :</div>
+                    <input type="text" id="colPreferredPositions" class="mapping-select" value="Postes acceptés">
+                </div>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Pied fort :</div>
+                    <input type="text" id="colFoot" class="mapping-select" value="Pied fort">
+                </div>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Points :</div>
+                    <input type="text" id="colPoints" class="mapping-select" value="Points">
+                </div>
+                
+                <div class="mapping-row">
+                    <div class="mapping-label">Présent :</div>
+                    <input type="text" id="colPresent" class="mapping-select" value="Présent">
+                </div>
+            </div>
+            
             <button id="loadSheetBtn" class="btn" style="margin-top: 15px; width: 100%">
                 <i class="fas fa-sync"></i> Charger les données
+            </button>
+            
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            
+            <div class="debug-panel" id="debugPanel" style="display: none;">
+                <div class="debug-title">Données brutes reçues :</div>
+                <pre id="rawData"></pre>
+            </div>
+            
+            <button id="toggleDebug" class="btn btn-debug" style="margin-top: 15px; width: 100%">
+                <i class="fas fa-bug"></i> Afficher les données brutes
             </button>
         </div>
         
@@ -838,6 +959,17 @@
         // Player data will be loaded from Google Sheets
         let players = [];
         
+        // Column mapping configuration
+        let columnMapping = {
+            firstName: "Prénom",
+            lastName: "Nom",
+            position: "Poste",
+            preferredPositions: "Postes acceptés",
+            foot: "Pied fort",
+            points: "Points",
+            present: "Présent"
+        };
+        
         // Tactics configuration with realistic positions
         const tacticsConfig = {
             "4-4-2": {
@@ -950,6 +1082,19 @@
         const sheetConnection = document.getElementById('sheetConnection');
         const overlay = document.getElementById('overlay');
         const connectionInfo = document.getElementById('connectionInfo');
+        const errorMessage = document.getElementById('errorMessage');
+        const debugPanel = document.getElementById('debugPanel');
+        const rawData = document.getElementById('rawData');
+        const toggleDebug = document.getElementById('toggleDebug');
+        
+        // Column mapping elements
+        const colFirstName = document.getElementById('colFirstName');
+        const colLastName = document.getElementById('colLastName');
+        const colPosition = document.getElementById('colPosition');
+        const colPreferredPositions = document.getElementById('colPreferredPositions');
+        const colFoot = document.getElementById('colFoot');
+        const colPoints = document.getElementById('colPoints');
+        const colPresent = document.getElementById('colPresent');
         
         // Initialize the app
         function initApp() {
@@ -960,10 +1105,14 @@
             connectBtn.addEventListener('click', showConnectionPanel);
             closeConnection.addEventListener('click', hideConnectionPanel);
             loadSheetBtn.addEventListener('click', loadSheetData);
+            toggleDebug.addEventListener('click', toggleDebugPanel);
             
             // Initialize fields
             renderField('A', tacticsTeamA.value);
             renderField('B', tacticsTeamB.value);
+            
+            // Load column mapping from localStorage
+            loadColumnMapping();
             
             // Try to load saved URL from localStorage
             const savedUrl = localStorage.getItem('googleScriptUrl');
@@ -974,6 +1123,38 @@
                 // Load sample data if no saved connection
                 loadSampleData();
             }
+        }
+        
+        // Load column mapping from localStorage
+        function loadColumnMapping() {
+            const savedMapping = localStorage.getItem('columnMapping');
+            if (savedMapping) {
+                columnMapping = JSON.parse(savedMapping);
+                
+                // Update UI
+                colFirstName.value = columnMapping.firstName;
+                colLastName.value = columnMapping.lastName;
+                colPosition.value = columnMapping.position;
+                colPreferredPositions.value = columnMapping.preferredPositions;
+                colFoot.value = columnMapping.foot;
+                colPoints.value = columnMapping.points;
+                colPresent.value = columnMapping.present;
+            }
+        }
+        
+        // Save column mapping to localStorage
+        function saveColumnMapping() {
+            columnMapping = {
+                firstName: colFirstName.value,
+                lastName: colLastName.value,
+                position: colPosition.value,
+                preferredPositions: colPreferredPositions.value,
+                foot: colFoot.value,
+                points: colPoints.value,
+                present: colPresent.value
+            };
+            
+            localStorage.setItem('columnMapping', JSON.stringify(columnMapping));
         }
         
         // Show connection panel
@@ -988,6 +1169,11 @@
             sheetConnection.classList.remove('active');
             overlay.classList.remove('active');
             document.body.style.overflow = '';
+        }
+        
+        // Toggle debug panel
+        function toggleDebugPanel() {
+            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
         }
         
         // Update connection status UI
@@ -1006,6 +1192,17 @@
                 indicator.classList.remove('connected');
                 connectionInfo.querySelector('span').textContent = 'Non connecté';
             }
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        // Hide error message
+        function hideError() {
+            errorMessage.style.display = 'none';
         }
         
         // Load sample data
@@ -1042,14 +1239,18 @@
         
         // Load data from Google Sheet via Apps Script
         function loadSheetData() {
+            hideError();
             const scriptUrl = scriptUrlInput.value.trim();
             if (!scriptUrl) {
-                alert("Veuillez entrer l'URL de votre script Google Apps Script");
+                showError("Veuillez entrer l'URL de votre script Google Apps Script");
                 return;
             }
             
             // Save URL to localStorage
             localStorage.setItem('googleScriptUrl', scriptUrl);
+            
+            // Save column mapping
+            saveColumnMapping();
             
             loadingIndicator.style.display = 'block';
             updateConnectionStatus(false, "Connexion en cours...");
@@ -1063,23 +1264,16 @@
                     return response.json();
                 })
                 .then(data => {
+                    // Show raw data in debug panel
+                    rawData.textContent = JSON.stringify(data, null, 2);
+                    
                     // Handle potential error from script
                     if (data.error) {
                         throw new Error(data.error);
                     }
                     
-                    players = data.map((row, index) => {
-                        return {
-                            id: index + 1,
-                            firstName: row["Prénom"] || "",
-                            lastName: row["Nom"] || "",
-                            position: row["Poste"] || "",
-                            preferredPositions: (row["Postes acceptés"] || "").split(';').map(p => p.trim()),
-                            foot: row["Pied fort"] || "",
-                            points: parseInt(row["Points"] || 0),
-                            present: (row["Présent"] || "").toLowerCase() === 'oui'
-                        };
-                    });
+                    // Parse data with column mapping
+                    players = parseSheetData(data);
                     
                     renderPlayersList();
                     generateTeams();
@@ -1089,10 +1283,32 @@
                 })
                 .catch(error => {
                     console.error("Error loading data from Google Script:", error);
-                    alert(`Erreur lors du chargement des données: ${error.message}`);
+                    showError(`Erreur lors du chargement des données: ${error.message}`);
                     loadingIndicator.style.display = 'none';
                     updateConnectionStatus(false, `Erreur: ${error.message}`);
                 });
+        }
+        
+        // Parse sheet data with column mapping
+        function parseSheetData(data) {
+            const mappedPlayers = [];
+            
+            data.forEach((row, index) => {
+                const player = {
+                    id: index + 1,
+                    firstName: row[columnMapping.firstName] || "",
+                    lastName: row[columnMapping.lastName] || "",
+                    position: row[columnMapping.position] || "",
+                    preferredPositions: (row[columnMapping.preferredPositions] || "").split(';').map(p => p.trim()),
+                    foot: row[columnMapping.foot] || "",
+                    points: parseInt(row[columnMapping.points] || 0),
+                    present: (row[columnMapping.present] || "").toString().toLowerCase() === 'oui'
+                };
+                
+                mappedPlayers.push(player);
+            });
+            
+            return mappedPlayers;
         }
         
         // Render players list
