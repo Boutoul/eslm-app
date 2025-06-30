@@ -17,6 +17,7 @@
             --line-color: #FFFFFF;
             --error-color: #ff4d4d;
             --success-color: #4CAF50;
+            --panel-color: rgba(30, 30, 30, 0.95);
         }
         
         * {
@@ -31,7 +32,11 @@
             color: var(--text-color);
             min-height: 100vh;
             padding: 20px;
-            background-image: linear-gradient(135deg, #0a0a0a 0%, #222222 100%);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(40, 40, 40, 0.8) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.1) 0%, transparent 40%),
+                linear-gradient(135deg, #0a0a0a 0%, #222222 100%);
+            background-attachment: fixed;
         }
         
         .container {
@@ -48,6 +53,7 @@
             border-bottom: 3px solid var(--secondary-color);
             margin-bottom: 30px;
             flex-wrap: wrap;
+            position: relative;
         }
         
         .logo-container {
@@ -66,6 +72,11 @@
             justify-content: center;
             border: 3px solid var(--text-color);
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .logo:hover {
+            transform: rotate(15deg);
         }
         
         .logo img {
@@ -125,6 +136,11 @@
         
         .btn-connect {
             background: #4285F4;
+            padding: 8px 15px;
+            font-size: 1rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
         
         .btn-connect:hover {
@@ -169,11 +185,23 @@
         .team-section {
             flex: 1;
             min-width: 400px;
-            background: rgba(30, 30, 30, 0.8);
+            background: var(--panel-color);
             border-radius: 15px;
             padding: 20px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             border: 2px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .team-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--secondary-color), transparent);
         }
         
         .team-header {
@@ -418,13 +446,28 @@
             justify-content: center;
         }
         
-        /* Sheet Connection */
+        /* Sheet Connection - Hidden by default */
         .sheet-connection {
-            background: rgba(40, 40, 40, 0.9);
+            background: var(--panel-color);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 30px;
             border: 2px solid var(--secondary-color);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+        }
+        
+        .sheet-connection.active {
+            display: block;
         }
         
         .sheet-connection h2 {
@@ -469,8 +512,40 @@
             font-family: monospace;
             white-space: pre-wrap;
             overflow-x: auto;
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .close-btn:hover {
+            color: var(--secondary-color);
+        }
+        
+        /* Overlay for modal */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 999;
+            display: none;
+        }
+        
+        .overlay.active {
+            display: block;
         }
         
         /* Responsive */
@@ -487,6 +562,13 @@
                 flex-direction: column;
                 gap: 20px;
             }
+            
+            .btn-connect {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-top: 10px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -500,6 +582,11 @@
             
             .club-name {
                 font-size: 2rem;
+            }
+            
+            .sheet-connection {
+                width: 95%;
+                padding: 15px;
             }
         }
         
@@ -545,9 +632,92 @@
             margin: 15px 0 10px;
             font-size: 1.2rem;
         }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .connection-info {
+            position: absolute;
+            top: 10px;
+            right: 160px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            background: rgba(40, 40, 40, 0.8);
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--secondary-color);
+        }
+        
+        .connection-info .status-indicator {
+            width: 10px;
+            height: 10px;
+        }
     </style>
 </head>
 <body>
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Hidden connection panel -->
+    <section class="sheet-connection" id="sheetConnection">
+        <button class="close-btn" id="closeConnection">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2>Configuration Google Sheets</h2>
+        
+        <div class="connection-status">
+            <div id="statusIndicator" class="status-indicator"></div>
+            <span id="statusText">Non connecté</span>
+        </div>
+        
+        <div class="script-instructions">
+            <h3 class="instructions-title">Étapes de configuration</h3>
+            <p>1. Ouvrez votre Google Sheet et créez un nouveau script via "Extensions > Apps Script"</p>
+            <p>2. Copiez-collez ce code dans l'éditeur :</p>
+            
+            <div class="script-code">function doGet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Joueurs");
+  if (!sheet) {
+    return ContentService.createTextOutput(JSON.stringify({ error: "Feuille 'Joueurs' introuvable" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const players = [];
+  
+  for (let i = 1; i < data.length; i++) {
+    const player = {};
+    for (let j = 0; j < headers.length; j++) {
+      player[headers[j]] = data[i][j];
+    }
+    players.push(player);
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify(players))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+            
+            <p>3. Déployez le script comme application web ("Déployer > Nouveau déploiement")</p>
+            <p>4. Configurez : "Exécuter en tant que" vous-même, "Qui a accès" : Tous</p>
+            <p>5. Copiez l'URL du déploiement et collez-la ci-dessous :</p>
+            
+            <div class="sheet-input">
+                <input type="text" id="scriptUrl" placeholder="URL de déploiement" style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid var(--secondary-color);">
+            </div>
+            
+            <button id="loadSheetBtn" class="btn" style="margin-top: 15px; width: 100%">
+                <i class="fas fa-sync"></i> Charger les données
+            </button>
+        </div>
+        
+        <div id="loadingIndicator" class="loading">
+            <i class="fas fa-spinner"></i> Chargement des données depuis Google Sheets...
+        </div>
+    </section>
+    
     <div class="container">
         <header>
             <div class="logo-container">
@@ -555,6 +725,11 @@
                     <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="ESLM Logo">
                 </div>
                 <h1 class="club-name">ESLM</h1>
+            </div>
+            
+            <div class="connection-info" id="connectionInfo">
+                <div class="status-indicator"></div>
+                <span>Non connecté</span>
             </div>
             
             <div class="controls">
@@ -584,69 +759,11 @@
                     <i class="fas fa-cogs"></i> Générer les équipes
                 </button>
             </div>
-        </header>
-        
-        <!-- Sheet Connection Section -->
-        <section class="sheet-connection">
-            <h2>Connexion à Google Sheets</h2>
-            
-            <div class="connection-status">
-                <div id="statusIndicator" class="status-indicator"></div>
-                <span id="statusText">Non connecté à Google Sheets</span>
-            </div>
             
             <button id="connectBtn" class="btn btn-connect">
-                <i class="fas fa-plug"></i> Se connecter à Google Sheets
+                <i class="fas fa-plug"></i> Configurer Google Sheets
             </button>
-            
-            <div class="script-instructions">
-                <h3 class="instructions-title">Configuration requise dans Google Sheets</h3>
-                <p>Pour connecter votre Google Sheet, suivez ces étapes :</p>
-                <ol>
-                    <li>Ouvrez votre Google Sheet</li>
-                    <li>Cliquez sur "Extensions" > "Apps Script"</li>
-                    <li>Copiez-collez ce code dans l'éditeur :</li>
-                </ol>
-                
-                <div class="script-code">function doGet() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Joueurs");
-  if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({ error: "Feuille 'Joueurs' introuvable" }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0];
-  const players = [];
-  
-  for (let i = 1; i < data.length; i++) {
-    const player = {};
-    for (let j = 0; j < headers.length; j++) {
-      player[headers[j]] = data[i][j];
-    }
-    players.push(player);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify(players))
-    .setMimeType(ContentService.MimeType.JSON);
-}</div>
-                
-                <ol start="4">
-                    <li>Cliquez sur "Déployer" > "Nouveau déploiement"</li>
-                    <li>Choisissez "Application Web" comme type de déploiement</li>
-                    <li>Configurez : "Exécuter en tant que" vous-même, "Qui a accès" : Tous</li>
-                    <li>Copiez l'URL du déploiement et collez-la ci-dessous</li>
-                </ol>
-                
-                <div class="sheet-input">
-                    <input type="text" id="scriptUrl" placeholder="Collez l'URL de déploiement ici" style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid var(--secondary-color);">
-                </div>
-            </div>
-            
-            <div id="loadingIndicator" class="loading">
-                <i class="fas fa-spinner"></i> Chargement des données depuis Google Sheets...
-            </div>
-        </section>
+        </header>
         
         <div class="teams-container">
             <!-- Team A Section -->
@@ -824,10 +941,15 @@
         const playersContainer = document.getElementById('players-container');
         const excludedPlayers = document.getElementById('excluded-players');
         const connectBtn = document.getElementById('connectBtn');
+        const closeConnection = document.getElementById('closeConnection');
+        const loadSheetBtn = document.getElementById('loadSheetBtn');
         const scriptUrlInput = document.getElementById('scriptUrl');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const statusIndicator = document.getElementById('statusIndicator');
         const statusText = document.getElementById('statusText');
+        const sheetConnection = document.getElementById('sheetConnection');
+        const overlay = document.getElementById('overlay');
+        const connectionInfo = document.getElementById('connectionInfo');
         
         // Initialize the app
         function initApp() {
@@ -835,7 +957,9 @@
             generateBtn.addEventListener('click', generateTeams);
             tacticsTeamA.addEventListener('change', () => renderField('A', tacticsTeamA.value));
             tacticsTeamB.addEventListener('change', () => renderField('B', tacticsTeamB.value));
-            connectBtn.addEventListener('click', loadSheetData);
+            connectBtn.addEventListener('click', showConnectionPanel);
+            closeConnection.addEventListener('click', hideConnectionPanel);
+            loadSheetBtn.addEventListener('click', loadSheetData);
             
             // Initialize fields
             renderField('A', tacticsTeamA.value);
@@ -846,7 +970,74 @@
             if (savedUrl) {
                 scriptUrlInput.value = savedUrl;
                 loadSheetData();
+            } else {
+                // Load sample data if no saved connection
+                loadSampleData();
             }
+        }
+        
+        // Show connection panel
+        function showConnectionPanel() {
+            sheetConnection.classList.add('active');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Hide connection panel
+        function hideConnectionPanel() {
+            sheetConnection.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Update connection status UI
+        function updateConnectionStatus(connected, message) {
+            statusText.textContent = message;
+            statusIndicator.className = "status-indicator";
+            if (connected) {
+                statusIndicator.classList.add("connected");
+                
+                // Update mini status indicator
+                connectionInfo.querySelector('.status-indicator').classList.add('connected');
+                connectionInfo.querySelector('span').textContent = 'Connecté';
+            } else {
+                // Update mini status indicator
+                const indicator = connectionInfo.querySelector('.status-indicator');
+                indicator.classList.remove('connected');
+                connectionInfo.querySelector('span').textContent = 'Non connecté';
+            }
+        }
+        
+        // Load sample data
+        function loadSampleData() {
+            players = [
+                { id: 1, firstName: "Lionel", lastName: "Messi", position: "AT", preferredPositions: ["AT", "MO"], foot: "Gauche", points: 95, present: true },
+                { id: 2, firstName: "Kylian", lastName: "Mbappé", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 92, present: true },
+                { id: 3, firstName: "Kevin", lastName: "De Bruyne", position: "MO", preferredPositions: ["MO", "MC"], foot: "Droit", points: 91, present: true },
+                { id: 4, firstName: "Virgil", lastName: "van Dijk", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 90, present: true },
+                { id: 5, firstName: "Thibaut", lastName: "Courtois", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 89, present: true },
+                { id: 6, firstName: "N'Golo", lastName: "Kanté", position: "MC", preferredPositions: ["MC", "MD"], foot: "Droit", points: 88, present: true },
+                { id: 7, firstName: "Joshua", lastName: "Kimmich", position: "MD", preferredPositions: ["MD", "MC"], foot: "Droit", points: 87, present: true },
+                { id: 8, firstName: "Ruben", lastName: "Dias", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 86, present: true },
+                { id: 9, firstName: "Trent", lastName: "Alexander-Arnold", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 85, present: true },
+                { id: 10, firstName: "Alphonso", lastName: "Davies", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 84, present: true },
+                { id: 11, firstName: "Karim", lastName: "Benzema", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 89, present: true },
+                { id: 12, firstName: "Luka", lastName: "Modrić", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 86, present: true },
+                { id: 13, firstName: "Erling", lastName: "Haaland", position: "AT", preferredPositions: ["AT"], foot: "Droit", points: 88, present: true },
+                { id: 14, firstName: "Achraf", lastName: "Hakimi", position: "LD", preferredPositions: ["LD", "MD"], foot: "Droit", points: 83, present: true },
+                { id: 15, firstName: "Marc-André", lastName: "ter Stegen", position: "GB", preferredPositions: ["GB"], foot: "Droit", points: 87, present: true },
+                { id: 16, firstName: "Marquinhos", lastName: "", position: "DC", preferredPositions: ["DC", "MD"], foot: "Droit", points: 85, present: true },
+                { id: 17, firstName: "Jude", lastName: "Bellingham", position: "MC", preferredPositions: ["MC", "MO"], foot: "Droit", points: 84, present: true },
+                { id: 18, firstName: "Theo", lastName: "Hernández", position: "LG", preferredPositions: ["LG", "MO"], foot: "Gauche", points: 83, present: true },
+                { id: 19, firstName: "Rodri", lastName: "", position: "MD", preferredPositions: ["MD", "DC"], foot: "Droit", points: 86, present: true },
+                { id: 20, firstName: "Bernardo", lastName: "Silva", position: "MO", preferredPositions: ["MO", "MC"], foot: "Gauche", points: 85, present: true },
+                { id: 21, firstName: "Ederson", lastName: "", position: "GB", preferredPositions: ["GB"], foot: "Gauche", points: 86, present: true },
+                { id: 22, firstName: "Antonio", lastName: "Rüdiger", position: "DC", preferredPositions: ["DC"], foot: "Droit", points: 82, present: true }
+            ];
+            
+            renderPlayersList();
+            generateTeams();
+            updateConnectionStatus(false, "Utilisation des données d'exemple");
         }
         
         // Load data from Google Sheet via Apps Script
@@ -894,6 +1085,7 @@
                     generateTeams();
                     loadingIndicator.style.display = 'none';
                     updateConnectionStatus(true, "Connecté avec succès!");
+                    hideConnectionPanel();
                 })
                 .catch(error => {
                     console.error("Error loading data from Google Script:", error);
@@ -901,15 +1093,6 @@
                     loadingIndicator.style.display = 'none';
                     updateConnectionStatus(false, `Erreur: ${error.message}`);
                 });
-        }
-        
-        // Update connection status UI
-        function updateConnectionStatus(connected, message) {
-            statusText.textContent = message;
-            statusIndicator.className = "status-indicator";
-            if (connected) {
-                statusIndicator.classList.add("connected");
-            }
         }
         
         // Render players list
