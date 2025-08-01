@@ -3,21 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESLM - Composition d'Équipes</title>
+    <title>ESLM - Gestion d'équipe</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #000000;
-            --secondary-color: #FFD700;
-            --accent-color: #333333;
-            --text-color: #FFFFFF;
-            --field-color: #2E8B57;
-            --substitute-color: #1E5A3A;
-            --goal-color: #C0C0C0;
-            --line-color: #FFFFFF;
-            --error-color: #ff4d4d;
-            --success-color: #4CAF50;
-            --panel-color: rgba(30, 30, 30, 0.95);
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --gray: #95a5a6;
         }
         
         * {
@@ -28,1470 +24,1681 @@
         }
         
         body {
-            background-color: var(--primary-color);
-            color: var(--text-color);
-            min-height: 100vh;
+            background-color: #f5f7fa;
+            color: var(--dark);
             padding: 20px;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(40, 40, 40, 0.8) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.1) 0%, transparent 40%),
-                linear-gradient(135deg, #0a0a0a 0%, #222222 100%);
-            background-attachment: fixed;
+            min-height: 100vh;
         }
         
-        .container {
-            max-width: 1800px;
+        .app-container {
+            max-width: 1400px;
             margin: 0 auto;
         }
         
-        /* Header Styles */
         header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            border-bottom: 3px solid var(--secondary-color);
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            position: relative;
-        }
-        
-        .logo-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
         }
         
         .logo {
-            width: 80px;
-            height: 80px;
-            background-color: var(--secondary-color);
-            border-radius: 50%;
             display: flex;
             align-items: center;
-            justify-content: center;
-            border: 3px solid var(--text-color);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
-            transition: transform 0.3s ease;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
         }
         
-        .logo:hover {
-            transform: rotate(15deg);
+        .logo i {
+            font-size: 2rem;
         }
         
-        .logo img {
-            width: 70%;
-            height: auto;
-        }
-        
-        .club-name {
-            font-size: 2.8rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--secondary-color);
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-        }
-        
-        .controls {
+        .tabs {
             display: flex;
-            gap: 15px;
+            background-color: white;
+            border-radius: 50px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .tab:not(.active):hover {
+            background-color: #f0f0f0;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
         }
         
         .btn {
-            background: var(--secondary-color);
-            color: var(--primary-color);
+            padding: 10px 20px;
             border: none;
-            padding: 12px 25px;
-            font-size: 1.2rem;
-            font-weight: 700;
             border-radius: 50px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
         }
         
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), var(--warning));
+            color: white;
+        }
+        
         .btn:hover {
-            background: #ffc800;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         
-        .btn:active {
-            transform: translateY(0);
-        }
-        
-        .btn-generate {
-            background: #4CAF50;
-        }
-        
-        .btn-generate:hover {
-            background: #45a049;
-        }
-        
-        .btn-connect {
-            background: #4285F4;
-            padding: 8px 15px;
-            font-size: 1rem;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-        
-        .btn-connect:hover {
-            background: #3367d6;
-        }
-        
-        .btn-debug {
-            background: #9C27B0;
-            padding: 8px 15px;
-            font-size: 1rem;
-        }
-        
-        .btn-debug:hover {
-            background: #7B1FA2;
-        }
-        
-        /* Tactics Selector */
-        .tactics-selector {
-            display: flex;
-            gap: 10px;
-            background: var(--accent-color);
-            padding: 10px 15px;
-            border-radius: 50px;
-            align-items: center;
-        }
-        
-        .tactics-selector label {
-            font-weight: 600;
-            color: var(--secondary-color);
-        }
-        
-        .tactics-selector select {
-            background: var(--primary-color);
-            color: var(--text-color);
-            border: 2px solid var(--secondary-color);
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 1rem;
-            outline: none;
-            cursor: pointer;
-        }
-        
-        /* Teams Container */
-        .teams-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 30px;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-        }
-        
-        .team-section {
-            flex: 1;
-            min-width: 400px;
-            background: var(--panel-color);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--secondary-color);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .team-section::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, var(--secondary-color), transparent);
-        }
-        
-        .team-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--secondary-color);
-        }
-        
-        .team-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--secondary-color);
-            text-transform: uppercase;
-        }
-        
-        .team-stats {
-            display: flex;
-            gap: 15px;
-            font-size: 1.1rem;
-        }
-        
-        .team-stats span {
-            background: var(--accent-color);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        
-        /* Football Field */
-        .field-container {
-            position: relative;
-            background: var(--field-color);
-            border-radius: 15px;
-            overflow: hidden;
-            height: 550px;
-            margin-bottom: 20px;
-            border: 3px solid #1a472a;
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .football-field {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--field-color);
-            background-image: 
-                /* Grand rectangle */
-                linear-gradient(to right, transparent 10%, var(--line-color) 10%, var(--line-color) 90%, transparent 90%),
-                linear-gradient(to bottom, transparent 10%, var(--line-color) 10%, var(--line-color) 90%, transparent 90%),
-                
-                /* Cercle central */
-                radial-gradient(circle at 50% 50%, transparent 0%, transparent 12%, var(--line-color) 12%, var(--line-color) 12.5%, transparent 12.5%),
-                
-                /* Demi-cercle milieu */
-                radial-gradient(circle at 50% 10%, transparent 0%, transparent 12%, var(--line-color) 12%, var(--line-color) 12.5%, transparent 12.5%),
-                radial-gradient(circle at 50% 90%, transparent 0%, transparent 12%, var(--line-color) 12%, var(--line-color) 12.5%, transparent 12.5%),
-                
-                /* Surface de réparation gauche */
-                linear-gradient(to right, transparent 10%, var(--line-color) 10%, var(--line-color) 10.5%, transparent 10.5%),
-                linear-gradient(to right, transparent 10%, var(--line-color) 10%, var(--line-color) 10.5%, transparent 10.5%),
-                linear-gradient(to bottom, transparent 25%, var(--line-color) 25%, var(--line-color) 75%, transparent 75%),
-                
-                /* Surface de réparation droite */
-                linear-gradient(to right, transparent 90%, var(--line-color) 90%, var(--line-color) 90.5%, transparent 90.5%),
-                linear-gradient(to bottom, transparent 25%, var(--line-color) 25%, var(--line-color) 75%, transparent 75%),
-                
-                /* Buts */
-                linear-gradient(to right, transparent 9.5%, var(--goal-color) 9.5%, var(--goal-color) 10.5%, transparent 10.5%),
-                linear-gradient(to right, transparent 89.5%, var(--goal-color) 89.5%, var(--goal-color) 90.5%, transparent 90.5%);
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            opacity: 0.3;
-        }
-        
-        .field-positions {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        .players-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: repeat(5, 1fr);
-            gap: 10px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
         
-        .position {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        
-        .position-label {
-            position: absolute;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.7rem;
-            font-weight: bold;
-            bottom: -15px;
-        }
-        
-        /* Substitute Section */
-        .substitutes {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            min-height: 120px;
-            background: var(--substitute-color);
-            border-radius: 10px;
-            padding: 15px;
-            border: 2px dashed #3a7d55;
-        }
-        
-        .sub-title {
-            width: 100%;
-            font-size: 1.2rem;
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        /* Player Card */
         .player-card {
-            background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-            border: 2px solid var(--secondary-color);
+            background: white;
             border-radius: 10px;
-            padding: 10px;
-            width: 120px;
-            text-align: center;
-            cursor: grab;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            border: 2px solid var(--light);
             position: relative;
-            z-index: 10;
         }
         
         .player-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(255, 215, 0, 0.3);
-            border-color: #ffc800;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .player-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .player-name {
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-            color: var(--secondary-color);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .player-position {
-            font-size: 0.8rem;
-            color: #aaa;
-            margin-bottom: 5px;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
         
         .player-stats {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            font-size: 0.8rem;
-        }
-        
-        .player-stats span {
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 3px;
-        }
-        
-        .foot-pref {
-            color: #4fc3f7;
+            padding: 15px;
+            background-color: #f9f9f9;
         }
         
         .player-points {
-            background: var(--secondary-color);
-            color: black;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
+            background: linear-gradient(135deg, var(--warning), var(--danger));
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .stars {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            font-size: 0.8rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            gap: 5px;
         }
         
-        /* Excluded Players */
-        .excluded-section {
-            background: rgba(50, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 2px solid #ff4d4d;
-        }
-        
-        .excluded-title {
-            font-size: 1.5rem;
-            color: #ff4d4d;
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: 700;
-        }
-        
-        .excluded-container {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        /* Player List */
-        .players-list {
-            margin-top: 40px;
-            padding: 20px;
-            background: rgba(30, 30, 30, 0.8);
-            border-radius: 15px;
-            border: 2px solid var(--secondary-color);
-        }
-        
-        .players-title {
-            font-size: 1.5rem;
-            color: var(--secondary-color);
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 700;
-        }
-        
-        .players-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-        }
-        
-        /* Sheet Connection - Hidden by default */
-        .sheet-connection {
-            background: var(--panel-color);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-            border: 2px solid var(--secondary-color);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
-        }
-        
-        .sheet-connection.active {
-            display: block;
-        }
-        
-        .sheet-connection h2 {
-            color: var(--secondary-color);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .connection-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-        
-        .status-indicator {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: var(--error-color);
-        }
-        
-        .status-indicator.connected {
-            background-color: var(--success-color);
-        }
-        
-        .script-instructions {
-            background: rgba(50, 50, 50, 0.8);
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            margin-top: 15px;
-        }
-        
-        .script-code {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-family: monospace;
-            white-space: pre-wrap;
-            overflow-x: auto;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
-            border: none;
-            color: var(--text-color);
+        .star {
+            color: var(--gray);
             font-size: 1.5rem;
             cursor: pointer;
-            transition: color 0.3s;
         }
         
-        .close-btn:hover {
-            color: var(--secondary-color);
+        .star.filled {
+            color: #f1c40f;
         }
         
-        /* Overlay for modal */
-        .overlay {
+        .player-details {
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .detail-badge {
+            background-color: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .player-actions {
+            padding: 10px 15px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--light);
+        }
+        
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 999;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
             display: none;
         }
         
-        .overlay.active {
-            display: block;
+        .modal-overlay.active {
+            display: flex;
         }
         
-        /* Responsive */
-        @media (max-width: 1200px) {
+        .modal {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        .attributes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .attribute-card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .attribute-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #ddd;
+            cursor: pointer;
+        }
+        
+        .dot.filled {
+            background-color: var(--secondary);
+        }
+        
+        .checkboxes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-item input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .teams-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .team {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 2px solid var(--light);
+        }
+        
+        .team-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .field-container {
+            position: relative;
+            margin: 20px;
+            height: 500px;
+            transform: rotate(90deg);
+            width: 90%;
+            margin: 20px auto;
+        }
+        
+        .field {
+            background-color: #2ecc71;
+            height: 100%;
+            position: relative;
+            border-radius: 5px;
+            border: 2px solid white;
+            overflow: hidden;
+        }
+        
+        .field-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid white;
+            border-radius: 5px;
+        }
+        
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+        
+        .center-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 2px;
+            height: 100%;
+            background-color: white;
+        }
+        
+        .player-position {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--dark);
+            cursor: move;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: 2px solid white;
+            z-index: 10;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 2px;
+            line-height: 1.1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: transform 0.2s;
+        }
+        
+        .player-position:hover {
+            transform: scale(1.1);
+            z-index: 20;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .player-position.goalkeeper {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .player-position.defender {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .player-position.midfielder {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .player-position.attacker {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .substitutes {
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        
+        .substitutes-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .substitutes-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .substitute-player {
+            background-color: var(--light);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .substitute-player:hover {
+            background-color: #d5dbdb;
+        }
+        
+        .players-list {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .players-list-columns {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .players-column {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .column-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .player-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .player-list-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .player-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .player-list-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+        
+        .player-list-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .player-list-points {
+            background-color: var(--light);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            min-width: 50px;
+            text-align: center;
+        }
+        
+        .excluded-list {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .settings-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .settings-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light);
+        }
+        
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-item input {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: right;
+        }
+        
+        .save-settings {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .foot-icon {
+            margin-right: 5px;
+        }
+        
+        .position-icon {
+            margin-right: 5px;
+        }
+        
+        .position-goalkeeper { color: #e74c3c; }
+        .position-defender { color: #3498db; }
+        .position-midfielder { color: #f39c12; }
+        .position-attacker { color: #2ecc71; }
+        
+        .auto-composition-btn {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
             .teams-container {
                 flex-direction: column;
             }
             
-            .team-section {
-                min-width: 100%;
+            .players-grid {
+                grid-template-columns: 1fr;
             }
             
-            header {
+            .tabs {
                 flex-direction: column;
-                gap: 20px;
+                border-radius: 10px;
             }
             
-            .btn-connect {
-                position: relative;
-                top: 0;
-                right: 0;
-                margin-top: 10px;
-            }
-        }
-        
-        @media (max-width: 768px) {
             .field-container {
-                height: 450px;
+                transform: rotate(0deg);
+                height: 350px;
             }
             
-            .player-card {
-                width: 100px;
+            .players-list-columns {
+                flex-direction: column;
             }
-            
-            .club-name {
-                font-size: 2rem;
-            }
-            
-            .sheet-connection {
-                width: 95%;
-                padding: 15px;
-            }
-        }
-        
-        .dragging {
-            opacity: 0.7;
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--secondary-color);
-        }
-        
-        .dropzone {
-            min-height: 50px;
-            border: 2px dashed var(--secondary-color);
-            border-radius: 8px;
-            margin: 10px 0;
-            padding: 10px;
-            transition: all 0.3s;
-        }
-        
-        .dropzone.active {
-            background: rgba(255, 215, 0, 0.1);
-            border: 2px solid #ffc800;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            font-size: 1.2rem;
-            color: var(--secondary-color);
-        }
-        
-        .loading i {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .instructions-title {
-            color: var(--secondary-color);
-            margin: 15px 0 10px;
-            font-size: 1.2rem;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .connection-info {
-            position: absolute;
-            top: 10px;
-            right: 160px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            background: rgba(40, 40, 40, 0.8);
-            padding: 5px 12px;
-            border-radius: 20px;
-            border: 1px solid var(--secondary-color);
-        }
-        
-        .connection-info .status-indicator {
-            width: 10px;
-            height: 10px;
-        }
-        
-        .column-mapping {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(50, 50, 50, 0.8);
-            border-radius: 10px;
-        }
-        
-        .mapping-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            background: rgba(40, 40, 40, 0.6);
-            border-radius: 8px;
-        }
-        
-        .mapping-label {
-            width: 150px;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        
-        .mapping-select {
-            flex: 1;
-            padding: 8px;
-            border-radius: 5px;
-            background: var(--primary-color);
-            color: var(--text-color);
-            border: 1px solid var(--secondary-color);
-        }
-        
-        .debug-panel {
-            background: rgba(30, 30, 30, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.9rem;
-            white-space: pre-wrap;
-            border: 1px solid var(--secondary-color);
-        }
-        
-        .debug-title {
-            color: var(--secondary-color);
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        
-        .error-message {
-            color: var(--error-color);
-            padding: 10px;
-            background: rgba(100, 0, 0, 0.3);
-            border-radius: 5px;
-            margin-top: 10px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="overlay" id="overlay"></div>
-    
-    <!-- Hidden connection panel -->
-    <section class="sheet-connection" id="sheetConnection">
-        <button class="close-btn" id="closeConnection">
-            <i class="fas fa-times"></i>
-        </button>
-        <h2>Configuration Google Sheets</h2>
-        
-        <div class="connection-status">
-            <div id="statusIndicator" class="status-indicator"></div>
-            <span id="statusText">Non connecté</span>
-        </div>
-        
-        <div class="script-instructions">
-            <h3 class="instructions-title">Étapes de configuration</h3>
-            <p>1. Ouvrez votre Google Sheet et créez un nouveau script via "Extensions > Apps Script"</p>
-            <p>2. Copiez-collez ce code dans l'éditeur :</p>
-            
-            <div class="script-code">function doGet() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Joueurs");
-  if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({ 
-      error: "Feuille 'Joueurs' introuvable. Vérifiez le nom de la feuille." 
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-  
-  const data = sheet.getDataRange().getValues();
-  const headers = data[0];
-  const players = [];
-  
-  for (let i = 1; i < data.length; i++) {
-    const player = {};
-    for (let j = 0; j < headers.length; j++) {
-      player[headers[j]] = data[i][j];
-    }
-    players.push(player);
-  }
-  
-  return ContentService.createTextOutput(JSON.stringify(players))
-    .setMimeType(ContentService.MimeType.JSON);
-}</div>
-            
-            <p>3. Déployez le script comme application web ("Déployer > Nouveau déploiement")</p>
-            <p>4. Configurez : "Exécuter en tant que" vous-même, "Qui a accès" : Tous</p>
-            <p>5. Copiez l'URL du déploiement et collez-la ci-dessous :</p>
-            
-            <div class="sheet-input">
-                <input type="text" id="scriptUrl" placeholder="URL de déploiement" style="width: 100%; padding: 10px; border-radius: 8px; background: #1a1a1a; color: white; border: 1px solid var(--secondary-color);">
-            </div>
-            
-            <div class="column-mapping">
-                <h3 class="instructions-title">Correspondance des colonnes</h3>
-                <p>Configuration automatique pour votre structure de données</p>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Nom :</div>
-                    <input type="text" id="colLastName" class="mapping-select" value="nom" readonly>
-                </div>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Poste :</div>
-                    <input type="text" id="colPosition" class="mapping-select" value="poste préféré" readonly>
-                </div>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Pied fort :</div>
-                    <input type="text" id="colFoot" class="mapping-select" value="pied" readonly>
-                </div>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Points :</div>
-                    <input type="text" id="colPoints" class="mapping-select" value="points" readonly>
-                </div>
-                
-                <div class="mapping-row">
-                    <div class="mapping-label">Présent :</div>
-                    <input type="text" id="colPresent" class="mapping-select" value="présent" readonly>
-                </div>
-            </div>
-            
-            <button id="loadSheetBtn" class="btn" style="margin-top: 15px; width: 100%">
-                <i class="fas fa-sync"></i> Charger les données
-            </button>
-            
-            <div id="errorMessage" class="error-message" style="display: none;"></div>
-            
-            <div class="debug-panel" id="debugPanel" style="display: none;">
-                <div class="debug-title">Données brutes reçues :</div>
-                <pre id="rawData"></pre>
-            </div>
-            
-            <button id="toggleDebug" class="btn btn-debug" style="margin-top: 15px; width: 100%">
-                <i class="fas fa-bug"></i> Afficher les données brutes
-            </button>
-        </div>
-        
-        <div id="loadingIndicator" class="loading">
-            <i class="fas fa-spinner"></i> Chargement des données depuis Google Sheets...
-        </div>
-    </section>
-    
-    <div class="container">
+    <div class="app-container">
         <header>
-            <div class="logo-container">
-                <div class="logo">
-                    <img src="https://i.postimg.cc/15j1R5RH/logo9.png" alt="ESLM Logo">
-                </div>
-                <h1 class="club-name">ESLM</h1>
+            <div class="logo">
+                <i class="fas fa-shoe-prints"></i>
+                <span>ESLM</span>
             </div>
-            
-            <div class="connection-info" id="connectionInfo">
-                <div class="status-indicator"></div>
-                <span>Non connecté</span>
+            <div class="user">
+                <i class="fas fa-user-circle"></i>
             </div>
-            
-            <div class="controls">
-                <div class="tactics-selector">
-                    <label for="tactics-teamA">Tactique Équipe A:</label>
-                    <select id="tactics-teamA">
-                        <option value="4-4-2">4-4-2</option>
-                        <option value="4-3-3">4-3-3</option>
-                        <option value="3-5-2">3-5-2</option>
-                        <option value="4-5-1">4-5-1</option>
-                        <option value="4-2-3-1">4-2-3-1</option>
-                    </select>
-                </div>
-                
-                <div class="tactics-selector">
-                    <label for="tactics-teamB">Tactique Équipe B:</label>
-                    <select id="tactics-teamB">
-                        <option value="4-4-2">4-4-2</option>
-                        <option value="4-3-3">4-3-3</option>
-                        <option value="3-5-2">3-5-2</option>
-                        <option value="4-5-1">4-5-1</option>
-                        <option value="5-3-2">5-3-2</option>
-                    </select>
-                </div>
-                
-                <button id="generateBtn" class="btn btn-generate">
-                    <i class="fas fa-cogs"></i> Générer les équipes
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-target="inventory">Inventaire</div>
+            <div class="tab" data-target="teams">Composition</div>
+            <div class="tab" data-target="settings">Paramètres</div>
+        </div>
+        
+        <!-- Section Inventaire -->
+        <div class="section active" id="inventory">
+            <div class="section-title">
+                <i class="fas fa-users"></i>
+                Inventaire des Joueurs
+                <button class="btn btn-primary" id="addPlayerBtn">
+                    <i class="fas fa-plus"></i> Nouveau Joueur
                 </button>
             </div>
             
-            <button id="connectBtn" class="btn btn-connect">
-                <i class="fas fa-plug"></i> Configurer Google Sheets
-            </button>
-        </header>
-        
-        <div class="teams-container">
-            <!-- Team A Section -->
-            <section class="team-section">
-                <div class="team-header">
-                    <h2 class="team-title">Équipe A</h2>
-                    <div class="team-stats">
-                        <span>Total: <span id="teamA-total">0</span> pts</span>
-                        <span>Moy: <span id="teamA-avg">0.0</span></span>
-                    </div>
-                </div>
-                
-                <div class="field-container">
-                    <div class="football-field"></div>
-                    <div class="field-positions" id="field-teamA">
-                        <!-- Positions will be generated by JS based on tactics -->
-                    </div>
-                </div>
-                
-                <div class="substitutes">
-                    <div class="sub-title">Remplaçants (<span id="subsA-count">0</span>)</div>
-                    <div class="dropzone" id="subs-teamA">
-                        <!-- Substitute players will be added here by JS -->
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Team B Section -->
-            <section class="team-section">
-                <div class="team-header">
-                    <h2 class="team-title">Équipe B</h2>
-                    <div class="team-stats">
-                        <span>Total: <span id="teamB-total">0</span> pts</span>
-                        <span>Moy: <span id="teamB-avg">0.0</span></span>
-                    </div>
-                </div>
-                
-                <div class="field-container">
-                    <div class="football-field"></div>
-                    <div class="field-positions" id="field-teamB">
-                        <!-- Positions will be generated by JS based on tactics -->
-                    </div>
-                </div>
-                
-                <div class="substitutes">
-                    <div class="sub-title">Remplaçants (<span id="subsB-count">0</span>)</div>
-                    <div class="dropzone" id="subs-teamB">
-                        <!-- Substitute players will be added here by JS -->
-                    </div>
-                </div>
-            </section>
+            <div class="players-grid" id="playersGrid">
+                <!-- Joueurs seront ajoutés ici dynamiquement -->
+            </div>
         </div>
         
-        <!-- Excluded Players Section -->
-        <section class="excluded-section">
-            <h2 class="excluded-title">Joueurs Écartés (<span id="excluded-count">0</span>)</h2>
-            <div class="excluded-container dropzone" id="excluded-players">
-                <!-- Excluded players will be added here by JS -->
+        <!-- Section Composition d'Équipes -->
+        <div class="section" id="teams">
+            <div class="section-title">
+                <i class="fas fa-tachometer-alt"></i>
+                Composition des Équipes
             </div>
-        </section>
+            
+            <div class="auto-composition-btn">
+                <button class="btn btn-primary" id="autoCompositionBtn">
+                    <i class="fas fa-robot"></i> Composition Automatique
+                </button>
+            </div>
+            
+            <div class="teams-container">
+                <div class="team">
+                    <div class="team-header">Équipe A</div>
+                    <div class="field-container">
+                        <div class="field" id="teamAField">
+                            <div class="field-lines"></div>
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <!-- Les joueurs seront placés ici dynamiquement -->
+                        </div>
+                    </div>
+                    
+                    <div class="substitutes">
+                        <div class="substitutes-title">Remplaçants</div>
+                        <div class="substitutes-list" id="teamASubs">
+                            <!-- Remplaçants de l'équipe A -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team">
+                    <div class="team-header">Équipe B</div>
+                    <div class="field-container">
+                        <div class="field" id="teamBField">
+                            <div class="field-lines"></div>
+                            <div class="center-circle"></div>
+                            <div class="center-line"></div>
+                            <!-- Les joueurs seront placés ici dynamiquement -->
+                        </div>
+                    </div>
+                    
+                    <div class="substitutes">
+                        <div class="substitutes-title">Remplaçants</div>
+                        <div class="substitutes-list" id="teamBSubs">
+                            <!-- Remplaçants de l'équipe B -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="players-list">
+                <div class="section-title">
+                    <i class="fas fa-list"></i>
+                    Liste des Joueurs
+                </div>
+                <div class="players-list-columns" id="playersListColumns">
+                    <!-- Colonnes par poste -->
+                </div>
+            </div>
+            
+            <div class="excluded-list">
+                <div class="section-title">
+                    <i class="fas fa-ban"></i>
+                    Joueurs Écartés
+                </div>
+                <div id="excludedPlayers">
+                    <!-- Joueurs écartés -->
+                </div>
+            </div>
+        </div>
         
-        <!-- Players List Section -->
-        <section class="players-list">
-            <h2 class="players-title">Liste des Joueurs (<span id="players-count">0</span> présents)</h2>
-            <div class="players-container" id="players-container">
-                <!-- Players list will be populated by JS -->
+        <!-- Section Paramètres -->
+        <div class="section" id="settings">
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                Paramètres de l'Application
             </div>
-        </section>
+            
+            <div class="settings-grid" id="settingsGrid">
+                <!-- Paramètres seront ajoutés ici dynamiquement -->
+            </div>
+            <div class="save-settings">
+                <button class="btn btn-primary" id="saveSettingsBtn">
+                    <i class="fas fa-save"></i> Enregistrer les Paramètres
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Nouveau Joueur -->
+    <div class="modal-overlay" id="newPlayerModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Créer un Nouveau Joueur</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="playerFirstName">Prénom</label>
+                    <input type="text" id="playerFirstName" class="form-control" placeholder="Entrez le prénom">
+                </div>
+                
+                <div class="form-group">
+                    <label for="playerLastName">Nom</label>
+                    <input type="text" id="playerLastName" class="form-control" placeholder="Entrez le nom">
+                </div>
+                
+                <button class="btn btn-primary" id="createPlayerBtn" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Créer le Joueur
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Détails Joueur -->
+    <div class="modal-overlay" id="playerDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Fiche Joueur</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nom Complet</label>
+                    <input type="text" class="form-control" id="playerFullName" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label>Étoiles</label>
+                    <div class="stars" id="playerStars">
+                        <!-- Étoiles dynamiques -->
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="text" class="form-control" id="playerScore" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="playerPosition">Poste Préférentiel</label>
+                    <select id="playerPosition" class="form-control">
+                        <option value="Gardien">Gardien</option>
+                        <option value="Défenseur">Défenseur</option>
+                        <option value="Milieu">Milieu</option>
+                        <option value="Attaquant">Attaquant</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="playerFoot">Pied Fort</label>
+                    <select id="playerFoot" class="form-control">
+                        <option value="Droitier">Droitier</option>
+                        <option value="Gaucher">Gaucher</option>
+                        <option value="Ambidextre">Ambidextre</option>
+                    </select>
+                </div>
+                
+                <div class="attributes-grid" id="playerAttributes">
+                    <!-- Attributs dynamiques -->
+                </div>
+                
+                <div class="settings-title" style="margin-top: 20px;">Actions</div>
+                
+                <div class="checkboxes-grid" id="playerActions">
+                    <!-- Actions dynamiques -->
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn btn-primary" id="savePlayerBtn" style="flex: 1;">
+                        <i class="fas fa-save"></i> Enregistrer
+                    </button>
+                    <button class="btn btn-danger" id="deletePlayerBtn" style="flex: 1;">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Player data will be loaded from Google Sheets
+        // Gestion des données
         let players = [];
-        
-        // Column mapping configuration for your specific sheet
-        const columnMapping = {
-            lastName: "nom",
-            position: "poste préféré",
-            foot: "pied",
-            points: "points",
-            present: "présent"
+        let currentPlayerId = null;
+        let settings = {
+            starPoints: 10,
+            rightFootPoints: 1,
+            leftFootPoints: 2,
+            ambidextrousPoints: 3,
+            dotPoints: 1,
+            excludedPoints: 2,
+            acceptedGoalkeeperPoints: 5,
+            acceptedDefenderPoints: 3,
+            acceptedMidfielderPoints: 1,
+            acceptedAttackerPoints: 1,
+            trainingPoints: 1,
+            eventPoints: 1,
+            tracingPoints: 1,
+            cleaningPoints: 1,
+            jerseysPoints: 1,
+            extraPoints: 1,
+            touchRefereePoints: 1,
+            centerRefereePoints: 1,
+            unjustifiedAbsencePoints: -5,
+            badBehaviorPoints: -10,
+            defendersCount: 4,
+            midfieldersCount: 4,
+            attackersCount: 2
         };
         
-        // Tactics configuration with realistic positions
-        const tacticsConfig = {
-            "4-4-2": {
-                positions: [
-                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
-                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
-                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
-                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
-                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
-                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
-                    { role: "MC", gridArea: "3/3/4/4", label: "Mil. Centre" },
-                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
-                    { role: "AT", gridArea: "2/2/3/3", label: "Attaquant" },
-                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
-                ]
-            },
-            "4-3-3": {
-                positions: [
-                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
-                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
-                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
-                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
-                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
-                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Déf" },
-                    { role: "MO", gridArea: "3/3/4/4", label: "Mil. Off" },
-                    { role: "AD", gridArea: "2/1/3/2", label: "Ail. Droit" },
-                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" },
-                    { role: "AG", gridArea: "2/4/3/5", label: "Ail. Gauche" }
-                ]
-            },
-            "3-5-2": {
-                positions: [
-                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
-                    { role: "DC", gridArea: "4/1/5/2", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
-                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
-                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
-                    { role: "MC", gridArea: "3/3/4/4", label: "Mil. Centre" },
-                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
-                    { role: "MO", gridArea: "2/2/3/3", label: "Mil. Off" },
-                    { role: "AT", gridArea: "2/1/3/2", label: "Attaquant" },
-                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
-                ]
-            },
-            "4-5-1": {
-                positions: [
-                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
-                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
-                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
-                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
-                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
-                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
-                    { role: "MC", gridArea: "3/3/4/4", label: "Mil. Centre" },
-                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
-                    { role: "MO", gridArea: "2/2/3/3", label: "Mil. Off" },
-                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
-                ]
-            },
-            "4-2-3-1": {
-                positions: [
-                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
-                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
-                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
-                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
-                    { role: "MD", gridArea: "3/2/4/3", label: "Mil. Déf" },
-                    { role: "MD", gridArea: "3/3/4/4", label: "Mil. Déf" },
-                    { role: "MO", gridArea: "2/1/3/2", label: "Mil. Off D" },
-                    { role: "MO", gridArea: "2/3/3/4", label: "Mil. Off C" },
-                    { role: "MO", gridArea: "2/4/3/5", label: "Mil. Off G" },
-                    { role: "AT", gridArea: "1/3/2/4", label: "Attaquant" }
-                ]
-            },
-            "5-3-2": {
-                positions: [
-                    { role: "GB", gridArea: "5/3/6/4", label: "Gardien" },
-                    { role: "LD", gridArea: "4/1/5/2", label: "Déf. Droit" },
-                    { role: "DC", gridArea: "4/2/5/3", label: "Déf. Central" },
-                    { role: "DC", gridArea: "4/3/5/4", label: "Déf. Central" },
-                    { role: "LG", gridArea: "4/4/5/5", label: "Déf. Gauche" },
-                    { role: "MD", gridArea: "3/1/4/2", label: "Mil. Droit" },
-                    { role: "MC", gridArea: "3/2/4/3", label: "Mil. Centre" },
-                    { role: "MG", gridArea: "3/4/4/5", label: "Mil. Gauche" },
-                    { role: "MO", gridArea: "2/2/3/3", label: "Mil. Off" },
-                    { role: "AT", gridArea: "2/1/3/2", label: "Attaquant" },
-                    { role: "AT", gridArea: "2/3/3/4", label: "Attaquant" }
-                ]
-            }
+        // Icônes pour les postes
+        const positionIcons = {
+            'Gardien': 'fas fa-tshirt position-goalkeeper',
+            'Défenseur': 'fas fa-shield-alt position-defender',
+            'Milieu': 'fas fa-compress-arrows-alt position-midfielder',
+            'Attaquant': 'fas fa-bullseye position-attacker'
         };
-
-        // DOM Elements
-        const generateBtn = document.getElementById('generateBtn');
-        const tacticsTeamA = document.getElementById('tactics-teamA');
-        const tacticsTeamB = document.getElementById('tactics-teamB');
-        const fieldTeamA = document.getElementById('field-teamA');
-        const fieldTeamB = document.getElementById('field-teamB');
-        const playersContainer = document.getElementById('players-container');
-        const excludedPlayers = document.getElementById('excluded-players');
-        const connectBtn = document.getElementById('connectBtn');
-        const closeConnection = document.getElementById('closeConnection');
-        const loadSheetBtn = document.getElementById('loadSheetBtn');
-        const scriptUrlInput = document.getElementById('scriptUrl');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const statusIndicator = document.getElementById('statusIndicator');
-        const statusText = document.getElementById('statusText');
-        const sheetConnection = document.getElementById('sheetConnection');
-        const overlay = document.getElementById('overlay');
-        const connectionInfo = document.getElementById('connectionInfo');
-        const errorMessage = document.getElementById('errorMessage');
-        const debugPanel = document.getElementById('debugPanel');
-        const rawData = document.getElementById('rawData');
-        const toggleDebug = document.getElementById('toggleDebug');
         
-        // Initialize the app
-        function initApp() {
-            // Add event listeners
-            generateBtn.addEventListener('click', generateTeams);
-            tacticsTeamA.addEventListener('change', () => renderField('A', tacticsTeamA.value));
-            tacticsTeamB.addEventListener('change', () => renderField('B', tacticsTeamB.value));
-            connectBtn.addEventListener('click', showConnectionPanel);
-            closeConnection.addEventListener('click', hideConnectionPanel);
-            loadSheetBtn.addEventListener('click', loadSheetData);
-            toggleDebug.addEventListener('click', toggleDebugPanel);
-            
-            // Initialize fields
-            renderField('A', tacticsTeamA.value);
-            renderField('B', tacticsTeamB.value);
-            
-            // Try to load saved URL from localStorage
-            const savedUrl = localStorage.getItem('googleScriptUrl');
-            if (savedUrl) {
-                scriptUrlInput.value = savedUrl;
-                loadSheetData();
-            } else {
-                // Load sample data if no saved connection
-                loadSampleData();
-            }
-        }
+        // Icônes pour le pied fort
+        const footIcons = {
+            'Droitier': 'fas fa-shoe-prints foot-icon',
+            'Gaucher': 'fas fa-shoe-prints fa-flip-horizontal foot-icon',
+            'Ambidextre': 'fas fa-socks foot-icon'
+        };
         
-        // Show connection panel
-        function showConnectionPanel() {
-            sheetConnection.classList.add('active');
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+        // Gestion des onglets
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.section');
         
-        // Hide connection panel
-        function hideConnectionPanel() {
-            sheetConnection.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-        
-        // Toggle debug panel
-        function toggleDebugPanel() {
-            debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        // Update connection status UI
-        function updateConnectionStatus(connected, message) {
-            statusText.textContent = message;
-            statusIndicator.className = "status-indicator";
-            if (connected) {
-                statusIndicator.classList.add("connected");
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-target');
                 
-                // Update mini status indicator
-                connectionInfo.querySelector('.status-indicator').classList.add('connected');
-                connectionInfo.querySelector('span').textContent = 'Connecté';
-            } else {
-                // Update mini status indicator
-                const indicator = connectionInfo.querySelector('.status-indicator');
-                indicator.classList.remove('connected');
-                connectionInfo.querySelector('span').textContent = 'Non connecté';
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === target) {
+                        section.classList.add('active');
+                        if (target === 'teams') {
+                            renderPlayersList();
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Gestion des modaux
+        const newPlayerModal = document.getElementById('newPlayerModal');
+        const playerDetailModal = document.getElementById('playerDetailModal');
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const createPlayerBtn = document.getElementById('createPlayerBtn');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        
+        // Ouvrir modal nouveau joueur
+        addPlayerBtn.addEventListener('click', () => {
+            newPlayerModal.classList.add('active');
+        });
+        
+        // Fermer modals
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                newPlayerModal.classList.remove('active');
+                playerDetailModal.classList.remove('active');
+            });
+        });
+        
+        // Fermer modals en cliquant en dehors
+        window.addEventListener('click', (e) => {
+            if (e.target === newPlayerModal) {
+                newPlayerModal.classList.remove('active');
             }
+            if (e.target === playerDetailModal) {
+                playerDetailModal.classList.remove('active');
+            }
+        });
+        
+        // Créer un nouveau joueur
+        createPlayerBtn.addEventListener('click', () => {
+            const firstName = document.getElementById('playerFirstName').value;
+            const lastName = document.getElementById('playerLastName').value;
+            
+            if (firstName && lastName) {
+                addPlayerToGrid(firstName, lastName);
+                newPlayerModal.classList.remove('active');
+                
+                // Réinitialiser le formulaire
+                document.getElementById('playerFirstName').value = '';
+                document.getElementById('playerLastName').value = '';
+            } else {
+                alert('Veuillez entrer un prénom et un nom');
+            }
+        });
+        
+        // Ajouter un joueur à la grille
+        function addPlayerToGrid(firstName, lastName) {
+            const playerId = Date.now();
+            
+            // Créer un nouvel objet pour chaque joueur
+            const newPlayer = {
+                id: playerId,
+                firstName: firstName,
+                lastName: lastName,
+                stars: 1,
+                position: 'Défenseur',
+                foot: 'Droitier',
+                attributes: {
+                    speed: 1,
+                    endurance: 1,
+                    technique: 1,
+                    heading: 1,
+                    physique: 1
+                },
+                actions: {
+                    excluded: false,
+                    acceptedGoalkeeper: false,
+                    acceptedDefender: true,
+                    acceptedMidfielder: false,
+                    acceptedAttacker: false,
+                    training: false,
+                    event: false,
+                    tracing: false,
+                    cleaning: false,
+                    jerseys: false,
+                    extra: false,
+                    touchReferee: false,
+                    centerReferee: false,
+                    unjustifiedAbsence: false,
+                    badBehavior: false
+                },
+                points: 10,
+                present: false
+            };
+            
+            players.push(newPlayer);
+            renderPlayersGrid();
         }
         
-        // Show error message
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-        }
-        
-        // Hide error message
-        function hideError() {
-            errorMessage.style.display = 'none';
-        }
-        
-        // Load sample data
-        function loadSampleData() {
-            players = [
-                { id: 1, lastName: "Jean Michel Bernard", position: "Gardien", foot: "Droitier", points: 23, present: true },
-                { id: 2, lastName: "Riffard Florian", position: "Milieu", foot: "Droitier", points: 32, present: true },
-                { id: 3, lastName: "Chanal Christophe", position: "Attaquant", foot: "Ambidextre", points: 38, present: true }
+        // Ouvrir la modal de détail d'un joueur
+        function openPlayerModal(playerId) {
+            const player = players.find(p => p.id === playerId);
+            if (!player) return;
+            
+            currentPlayerId = playerId;
+            
+            // Mettre à jour le titre
+            document.getElementById('playerFullName').value = `${player.firstName} ${player.lastName}`;
+            
+            // Étoiles
+            const starsContainer = document.getElementById('playerStars');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const star = document.createElement('div');
+                star.className = `star ${i < player.stars ? 'filled' : ''}`;
+                star.innerHTML = '<i class="fas fa-star"></i>';
+                star.addEventListener('click', () => toggleStar(i+1));
+                starsContainer.appendChild(star);
+            }
+            
+            // Score
+            document.getElementById('playerScore').value = `${player.points} points`;
+            
+            // Poste
+            document.getElementById('playerPosition').value = player.position;
+            
+            // Pied fort
+            document.getElementById('playerFoot').value = player.foot;
+            
+            // Attributs
+            const attributesContainer = document.getElementById('playerAttributes');
+            attributesContainer.innerHTML = '';
+            
+            const attributes = [
+                { name: 'Vitesse', key: 'speed' },
+                { name: 'Endurance', key: 'endurance' },
+                { name: 'Technique', key: 'technique' },
+                { name: 'Jeu de Tête', key: 'heading' },
+                { name: 'Physique', key: 'physique' }
             ];
             
-            renderPlayersList();
-            generateTeams();
-            updateConnectionStatus(false, "Utilisation des données d'exemple");
+            attributes.forEach(attr => {
+                const attributeCard = document.createElement('div');
+                attributeCard.className = 'attribute-card';
+                attributeCard.innerHTML = `
+                    <div class="attribute-title">${attr.name}</div>
+                    <div class="dots">
+                        <div class="dot ${player.attributes[attr.key] >= 1 ? 'filled' : ''}"></div>
+                        <div class="dot ${player.attributes[attr.key] >= 2 ? 'filled' : ''}"></div>
+                        <div class="dot ${player.attributes[attr.key] >= 3 ? 'filled' : ''}"></div>
+                    </div>
+                `;
+                
+                // Ajouter les événements aux points
+                const dots = attributeCard.querySelectorAll('.dot');
+                dots.forEach((dot, index) => {
+                    dot.addEventListener('click', () => {
+                        player.attributes[attr.key] = index + 1;
+                        updatePlayerPoints(player);
+                        
+                        // Mettre à jour l'affichage des dots
+                        dots.forEach((d, idx) => {
+                            if (idx <= index) {
+                                d.classList.add('filled');
+                            } else {
+                                d.classList.remove('filled');
+                            }
+                        });
+                        
+                        document.getElementById('playerScore').value = `${player.points} points`;
+                    });
+                });
+                
+                attributesContainer.appendChild(attributeCard);
+            });
+            
+            // Actions - Ajout des 5 actions manquantes
+            const actionsContainer = document.getElementById('playerActions');
+            actionsContainer.innerHTML = '';
+            
+            const actions = [
+                { id: 'action1', label: 'Déjà écarté', key: 'excluded' },
+                { id: 'action2', label: 'Gardien accepté', key: 'acceptedGoalkeeper' },
+                { id: 'action3', label: 'Défenseur accepté', key: 'acceptedDefender' },
+                { id: 'action4', label: 'Milieu accepté', key: 'acceptedMidfielder' },
+                { id: 'action5', label: 'Attaquant accepté', key: 'acceptedAttacker' },
+                { id: 'action6', label: 'Présence entrainement', key: 'training' },
+                { id: 'action7', label: 'Présence évènement', key: 'event' },
+                { id: 'action8', label: 'Traçage', key: 'tracing' },
+                { id: 'action9', label: 'Nettoyage vestiaire', key: 'cleaning' },
+                { id: 'action10', label: 'Maillots', key: 'jerseys' },
+                { id: 'action11', label: 'Extra', key: 'extra' },
+                { id: 'action12', label: 'Arbitrage touche', key: 'touchReferee' },
+                { id: 'action13', label: 'Arbitrage centre', key: 'centerReferee' },
+                { id: 'action14', label: 'Absence injustifiée', key: 'unjustifiedAbsence' },
+                { id: 'action15', label: 'Mauvais comportement', key: 'badBehavior' }
+            ];
+            
+            actions.forEach((action, index) => {
+                const checkboxItem = document.createElement('div');
+                checkboxItem.className = 'checkbox-item';
+                checkboxItem.innerHTML = `
+                    <input type="checkbox" id="${action.id}" ${player.actions[action.key] ? 'checked' : ''}>
+                    <label for="${action.id}">${action.label}</label>
+                `;
+                
+                // Ajouter l'événement
+                const checkbox = checkboxItem.querySelector('input');
+                checkbox.addEventListener('change', () => {
+                    player.actions[action.key] = checkbox.checked;
+                    updatePlayerPoints(player);
+                    document.getElementById('playerScore').value = `${player.points} points`;
+                });
+                
+                actionsContainer.appendChild(checkboxItem);
+            });
+            
+            // Bouton Enregistrer
+            document.getElementById('savePlayerBtn').addEventListener('click', () => {
+                player.position = document.getElementById('playerPosition').value;
+                player.foot = document.getElementById('playerFoot').value;
+                updatePlayerPoints(player);
+                renderPlayersGrid();
+                renderPlayersList();
+                playerDetailModal.classList.remove('active');
+            });
+            
+            // Bouton Supprimer
+            document.getElementById('deletePlayerBtn').addEventListener('click', () => {
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce joueur ?')) {
+                    players = players.filter(p => p.id !== playerId);
+                    renderPlayersGrid();
+                    renderPlayersList();
+                    playerDetailModal.classList.remove('active');
+                }
+            });
+            
+            // Afficher la modal
+            playerDetailModal.classList.add('active');
         }
         
-        // Load data from Google Sheet via Apps Script
-        function loadSheetData() {
-            hideError();
-            const scriptUrl = scriptUrlInput.value.trim();
-            if (!scriptUrl) {
-                showError("Veuillez entrer l'URL de votre script Google Apps Script");
-                return;
+        // Mettre à jour le score d'un joueur
+        function updatePlayerPoints(player) {
+            // Calculer les points des étoiles
+            let points = player.stars * settings.starPoints;
+            
+            // Points du pied
+            if (player.foot === 'Droitier') points += settings.rightFootPoints;
+            else if (player.foot === 'Gaucher') points += settings.leftFootPoints;
+            else if (player.foot === 'Ambidextre') points += settings.ambidextrousPoints;
+            
+            // Points des attributs
+            Object.values(player.attributes).forEach(value => {
+                points += value * settings.dotPoints;
+            });
+            
+            // Points des actions
+            if (player.actions.excluded) points += settings.excludedPoints;
+            if (player.actions.acceptedGoalkeeper) points += settings.acceptedGoalkeeperPoints;
+            if (player.actions.acceptedDefender) points += settings.acceptedDefenderPoints;
+            if (player.actions.acceptedMidfielder) points += settings.acceptedMidfielderPoints;
+            if (player.actions.acceptedAttacker) points += settings.acceptedAttackerPoints;
+            if (player.actions.training) points += settings.trainingPoints;
+            if (player.actions.event) points += settings.eventPoints;
+            if (player.actions.tracing) points += settings.tracingPoints;
+            if (player.actions.cleaning) points += settings.cleaningPoints;
+            if (player.actions.jerseys) points += settings.jerseysPoints;
+            if (player.actions.extra) points += settings.extraPoints;
+            if (player.actions.touchReferee) points += settings.touchRefereePoints;
+            if (player.actions.centerReferee) points += settings.centerRefereePoints;
+            if (player.actions.unjustifiedAbsence) points += settings.unjustifiedAbsencePoints;
+            if (player.actions.badBehavior) points += settings.badBehaviorPoints;
+            
+            player.points = points;
+        }
+        
+        // Changer le nombre d'étoiles
+        function toggleStar(count) {
+            const player = players.find(p => p.id === currentPlayerId);
+            if (player) {
+                player.stars = count;
+                updatePlayerPoints(player);
+                
+                // Mettre à jour l'affichage des étoiles
+                const stars = document.querySelectorAll('#playerStars .star');
+                stars.forEach((star, index) => {
+                    if (index < count) {
+                        star.classList.add('filled');
+                    } else {
+                        star.classList.remove('filled');
+                    }
+                });
+                
+                document.getElementById('playerScore').value = `${player.points} points`;
+            }
+        }
+        
+        // Afficher les joueurs dans la grille
+        function renderPlayersGrid() {
+            const playersGrid = document.getElementById('playersGrid');
+            playersGrid.innerHTML = '';
+            
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'player-card';
+                playerCard.dataset.id = player.id;
+                
+                // Générer les étoiles
+                let starsHtml = '';
+                for (let i = 0; i < 3; i++) {
+                    starsHtml += `<div class="star ${i < player.stars ? 'filled' : ''}"><i class="fas fa-star"></i></div>`;
+                }
+                
+                // Générer les attributs (exemple: vitesse)
+                const speedDots = '●'.repeat(player.attributes.speed) + '○'.repeat(3 - player.attributes.speed);
+                
+                // Icône de pied
+                const footIcon = footIcons[player.foot] || 'fas fa-shoe-prints';
+                
+                playerCard.innerHTML = `
+                    <div class="player-header">
+                        <div class="player-name">${player.firstName} ${player.lastName}</div>
+                        <div class="player-position-badge">
+                            <i class="${positionIcons[player.position]} position-icon"></i>${player.position}
+                        </div>
+                    </div>
+                    <div class="player-stats">
+                        <div class="stars">
+                            ${starsHtml}
+                        </div>
+                        <div class="player-points">${player.points} pts</div>
+                    </div>
+                    <div class="player-details">
+                        <div class="detail-badge">
+                            <i class="${footIcon}"></i>
+                            ${player.foot}
+                        </div>
+                        <div class="detail-badge">
+                            <i class="fas fa-running"></i>
+                            Vitesse: ${speedDots}
+                        </div>
+                    </div>
+                    <div class="player-actions">
+                        <button class="btn edit-player">
+                            <i class="fas fa-edit"></i> Modifier
+                        </button>
+                    </div>
+                `;
+                
+                playersGrid.appendChild(playerCard);
+                
+                // Ajouter l'événement pour ouvrir les détails du joueur
+                playerCard.querySelector('.edit-player').addEventListener('click', () => {
+                    openPlayerModal(player.id);
+                });
+            });
+        }
+        
+        // Initialisation des paramètres
+        function initSettings() {
+            const settingsGrid = document.getElementById('settingsGrid');
+            settingsGrid.innerHTML = '';
+            
+            // Paramètres des points
+            const pointsSettings = [
+                { title: 'Points par Attribut', items: [
+                    { label: 'Étoile', key: 'starPoints' },
+                    { label: 'Droitier', key: 'rightFootPoints' },
+                    { label: 'Gaucher', key: 'leftFootPoints' },
+                    { label: 'Ambidextre', key: 'ambidextrousPoints' },
+                    { label: 'Rond vert', key: 'dotPoints' }
+                ]},
+                { title: 'Points par Action', items: [
+                    { label: 'Déjà écarté', key: 'excludedPoints' },
+                    { label: 'Gardien accepté', key: 'acceptedGoalkeeperPoints' },
+                    { label: 'Défenseur accepté', key: 'acceptedDefenderPoints' },
+                    { label: 'Milieu accepté', key: 'acceptedMidfielderPoints' },
+                    { label: 'Attaquant accepté', key: 'acceptedAttackerPoints' },
+                    { label: 'Présence entrainement', key: 'trainingPoints' },
+                    { label: 'Présence évènement', key: 'eventPoints' },
+                    { label: 'Traçage', key: 'tracingPoints' },
+                    { label: 'Nettoyage vestiaire', key: 'cleaningPoints' },
+                    { label: 'Maillots', key: 'jerseysPoints' },
+                    { label: 'Extra', key: 'extraPoints' },
+                    { label: 'Arbitrage touche', key: 'touchRefereePoints' },
+                    { label: 'Arbitrage centre', key: 'centerRefereePoints' }
+                ]},
+                { title: 'Points Négatifs', items: [
+                    { label: 'Absence injustifiée', key: 'unjustifiedAbsencePoints' },
+                    { label: 'Mauvais comportement', key: 'badBehaviorPoints' }
+                ]},
+                { title: 'Composition d\'Équipe', items: [
+                    { label: 'Défenseurs', key: 'defendersCount' },
+                    { label: 'Milieux', key: 'midfieldersCount' },
+                    { label: 'Attaquants', key: 'attackersCount' }
+                ]}
+            ];
+            
+            pointsSettings.forEach(category => {
+                const settingsCard = document.createElement('div');
+                settingsCard.className = 'settings-card';
+                
+                let itemsHtml = `<div class="settings-title">${category.title}</div>`;
+                
+                category.items.forEach(item => {
+                    itemsHtml += `
+                        <div class="settings-item">
+                            <span>${item.label}</span>
+                            <input type="number" id="setting_${item.key}" value="${settings[item.key]}">
+                        </div>
+                    `;
+                });
+                
+                settingsCard.innerHTML = itemsHtml;
+                settingsGrid.appendChild(settingsCard);
+            });
+            
+            // Sauvegarder les paramètres
+            document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+                Object.keys(settings).forEach(key => {
+                    const input = document.getElementById(`setting_${key}`);
+                    if (input) {
+                        settings[key] = parseInt(input.value) || 0;
+                    }
+                });
+                
+                // Recalculer les points de tous les joueurs
+                players.forEach(player => {
+                    updatePlayerPoints(player);
+                });
+                
+                renderPlayersGrid();
+                renderPlayersList();
+                alert('Paramètres enregistrés avec succès!');
+            });
+        }
+        
+        // Afficher la liste des joueurs pour la composition
+        function renderPlayersList() {
+            const playersListColumns = document.getElementById('playersListColumns');
+            const excludedPlayers = document.getElementById('excludedPlayers');
+            
+            playersListColumns.innerHTML = '';
+            excludedPlayers.innerHTML = '';
+            
+            // Créer les colonnes par poste
+            const positions = ['Gardien', 'Défenseur', 'Milieu', 'Attaquant'];
+            
+            positions.forEach(position => {
+                const column = document.createElement('div');
+                column.className = 'players-column';
+                column.innerHTML = `<div class="column-title">${position}</div>`;
+                
+                // Filtrer les joueurs par poste
+                const positionPlayers = players.filter(p => p.position === position);
+                
+                positionPlayers.forEach(player => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'player-list-item';
+                    listItem.dataset.id = player.id;
+                    
+                    listItem.innerHTML = `
+                        <div class="player-list-info">
+                            <input type="checkbox" ${player.present ? 'checked' : ''}>
+                            <div class="player-list-name">${player.firstName} ${player.lastName}</div>
+                        </div>
+                        <div class="player-list-points">${player.points} pts</div>
+                    `;
+                    
+                    // Ajouter l'événement pour cocher la présence
+                    const checkbox = listItem.querySelector('input');
+                    checkbox.addEventListener('change', () => {
+                        player.present = checkbox.checked;
+                        renderPlayersList();
+                    });
+                    
+                    column.appendChild(listItem);
+                });
+                
+                playersListColumns.appendChild(column);
+            });
+        }
+        
+        // Composition automatique des équipes
+        function autoComposeTeams() {
+            // Filtrer les joueurs présents
+            const presentPlayers = players.filter(p => p.present);
+            
+            // Trier par points décroissants
+            presentPlayers.sort((a, b) => b.points - a.points);
+            
+            // Répartir les joueurs par poste
+            const goalkeepers = presentPlayers.filter(p => p.position === 'Gardien');
+            const defenders = presentPlayers.filter(p => p.position === 'Défenseur');
+            const midfielders = presentPlayers.filter(p => p.position === 'Milieu');
+            const attackers = presentPlayers.filter(p => p.position === 'Attaquant');
+            
+            // Répartir les joueurs dans les équipes
+            const teamA = [];
+            const teamB = [];
+            
+            // Distribuer les gardiens
+            if (goalkeepers.length >= 2) {
+                teamA.push(goalkeepers[0]);
+                teamB.push(goalkeepers[1]);
+            } else if (goalkeepers.length === 1) {
+                teamA.push(goalkeepers[0]);
             }
             
-            // Save URL to localStorage
-            localStorage.setItem('googleScriptUrl', scriptUrl);
+            // Distribuer les défenseurs
+            distributePlayers(defenders, teamA, teamB, settings.defendersCount);
             
-            loadingIndicator.style.display = 'block';
-            updateConnectionStatus(false, "Connexion en cours...");
+            // Distribuer les milieux
+            distributePlayers(midfielders, teamA, teamB, settings.midfieldersCount);
             
-            // Fetch player data from Google Apps Script
-            fetch(scriptUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Erreur HTTP! Statut: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Show raw data in debug panel
-                    rawData.textContent = JSON.stringify(data, null, 2);
-                    
-                    // Handle potential error from script
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-                    
-                    // Parse data with column mapping
-                    players = parseSheetData(data);
-                    
-                    renderPlayersList();
-                    generateTeams();
-                    loadingIndicator.style.display = 'none';
-                    updateConnectionStatus(true, "Connecté avec succès!");
-                    hideConnectionPanel();
-                })
-                .catch(error => {
-                    console.error("Error loading data from Google Script:", error);
-                    showError(`Erreur lors du chargement des données: ${error.message}`);
-                    loadingIndicator.style.display = 'none';
-                    updateConnectionStatus(false, `Erreur: ${error.message}`);
-                });
+            // Distribuer les attaquants
+            distributePlayers(attackers, teamA, teamB, settings.attackersCount);
+            
+            // Afficher les équipes
+            renderTeam(teamA, 'teamAField', 'teamASubs');
+            renderTeam(teamB, 'teamBField', 'teamBSubs');
         }
         
-        // Parse sheet data with column mapping
-        function parseSheetData(data) {
-            const mappedPlayers = [];
+        // Répartir les joueurs entre les équipes
+        function distributePlayers(playersList, teamA, teamB, countPerTeam) {
+            let index = 0;
             
-            data.forEach((row, index) => {
-                // Map position names to standard codes
-                const positionMap = {
-                    "Gardien": "GB",
-                    "Défenseur": "DC",
-                    "Milieu": "MC",
-                    "Attaquant": "AT"
-                };
-                
-                const position = positionMap[row[columnMapping.position]] || row[columnMapping.position];
-                
-                // Handle presence value (TRUE/FALSE)
-                let present = false;
-                if (typeof row[columnMapping.present] === 'string') {
-                    present = row[columnMapping.present].toUpperCase() === 'TRUE';
-                } else {
-                    present = Boolean(row[columnMapping.present]);
+            while (index < playersList.length) {
+                if (teamA.length < countPerTeam * 2 && teamA.filter(p => p.position === playersList[index].position).length < countPerTeam) {
+                    teamA.push(playersList[index]);
+                } else if (teamB.filter(p => p.position === playersList[index].position).length < countPerTeam) {
+                    teamB.push(playersList[index]);
                 }
-                
-                // Parse points as number
-                let points = 0;
-                if (typeof row[columnMapping.points] === 'number') {
-                    points = row[columnMapping.points];
-                } else if (typeof row[columnMapping.points] === 'string') {
-                    points = parseInt(row[columnMapping.points]) || 0;
-                }
-                
-                const player = {
-                    id: index + 1,
-                    lastName: row[columnMapping.lastName] || "",
-                    position: position,
-                    foot: row[columnMapping.foot] || "",
-                    points: points,
-                    present: present
-                };
-                
-                mappedPlayers.push(player);
-            });
-            
-            return mappedPlayers;
+                index++;
+            }
         }
         
-        // Render players list
-        function renderPlayersList() {
-            playersContainer.innerHTML = '';
+        // Afficher une équipe sur le terrain
+        function renderTeam(team, fieldId, subsId) {
+            const field = document.getElementById(fieldId);
+            const subsContainer = document.getElementById(subsId);
             
-            const presentPlayers = players.filter(player => player.present);
-            document.getElementById('players-count').textContent = presentPlayers.length;
-            
-            presentPlayers.forEach(player => {
-                const playerCard = createPlayerCard(player);
-                playersContainer.appendChild(playerCard);
-            });
-        }
-        
-        // Create player card element
-        function createPlayerCard(player) {
-            const card = document.createElement('div');
-            card.className = 'player-card';
-            card.draggable = true;
-            card.dataset.id = player.id;
-            card.dataset.position = player.position;
-            card.dataset.points = player.points;
-            
-            card.innerHTML = `
-                <div class="player-name">${player.lastName}</div>
-                <div class="player-position">${getPositionName(player.position)}</div>
-                <div class="player-stats">
-                    <span class="foot-pref"><i class="fas fa-shoe-prints"></i> ${player.foot}</span>
-                </div>
-                <div class="player-points">${player.points}</div>
+            // Vider le terrain et les remplaçants
+            field.innerHTML = `
+                <div class="field-lines"></div>
+                <div class="center-circle"></div>
+                <div class="center-line"></div>
             `;
+            subsContainer.innerHTML = '';
             
-            // Add drag events
-            card.addEventListener('dragstart', handleDragStart);
-            card.addEventListener('dragend', handleDragEnd);
-            
-            return card;
-        }
-        
-        // Handle drag start
-        function handleDragStart(e) {
-            e.dataTransfer.setData('text/plain', e.target.dataset.id);
-            e.target.classList.add('dragging');
-            
-            // Add dropzone highlighting
-            document.querySelectorAll('.dropzone').forEach(dz => {
-                dz.classList.add('active');
-            });
-        }
-        
-        // Handle drag end
-        function handleDragEnd(e) {
-            e.target.classList.remove('dragging');
-            
-            // Remove dropzone highlighting
-            document.querySelectorAll('.dropzone').forEach(dz => {
-                dz.classList.remove('active');
-            });
-        }
-        
-        // Get position name from abbreviation
-        function getPositionName(abbr) {
+            // Positions par poste
             const positions = {
-                "GB": "Gardien",
-                "DC": "Déf. Central",
-                "LD": "Déf. Droit",
-                "LG": "Déf. Gauche",
-                "MD": "Mil. Déf",
-                "MC": "Mil. Centre",
-                "MO": "Mil. Off",
-                "MG": "Mil. Gauche",
-                "AD": "Ail. Droit",
-                "AG": "Ail. Gauche",
-                "AT": "Attaquant"
+                'Gardien': [{ top: 85, left: 50 }],
+                'Défenseur': [
+                    { top: 70, left: 25 },
+                    { top: 70, left: 75 },
+                    { top: 65, left: 37 },
+                    { top: 65, left: 63 }
+                ],
+                'Milieu': [
+                    { top: 50, left: 20 },
+                    { top: 50, left: 35 },
+                    { top: 50, left: 50 },
+                    { top: 50, left: 65 },
+                    { top: 50, left: 80 }
+                ],
+                'Attaquant': [
+                    { top: 30, left: 40 },
+                    { top: 30, left: 60 }
+                ]
             };
-            return positions[abbr] || abbr;
-        }
-        
-        // Render football field positions
-        function renderField(team, tactic) {
-            const field = team === 'A' ? fieldTeamA : fieldTeamB;
-            field.innerHTML = '';
             
-            const positions = tacticsConfig[tactic].positions;
+            // Compteurs de position par poste
+            const positionCounters = {
+                'Gardien': 0,
+                'Défenseur': 0,
+                'Milieu': 0,
+                'Attaquant': 0
+            };
             
-            positions.forEach(pos => {
-                const positionEl = document.createElement('div');
-                positionEl.className = 'position';
-                positionEl.style.gridArea = pos.gridArea;
-                positionEl.dataset.role = pos.role;
+            // Placer les joueurs sur le terrain
+            team.forEach(player => {
+                const positionType = player.position;
+                const positionIndex = positionCounters[positionType];
                 
-                // Add drop zone
-                positionEl.addEventListener('dragover', handleDragOver);
-                positionEl.addEventListener('drop', (e) => handleDrop(e, positionEl));
-                
-                const label = document.createElement('div');
-                label.className = 'position-label';
-                label.textContent = pos.label;
-                positionEl.appendChild(label);
-                
-                field.appendChild(positionEl);
+                if (positions[positionType] && positionIndex < positions[positionType].length) {
+                    const pos = positions[positionType][positionIndex];
+                    const playerElement = document.createElement('div');
+                    playerElement.className = `player-position ${getPositionClass(positionType)}`;
+                    playerElement.style.top = `${pos.top}%`;
+                    playerElement.style.left = `${pos.left}%`;
+                    playerElement.textContent = player.firstName.charAt(0) + player.lastName.charAt(0);
+                    playerElement.dataset.id = player.id;
+                    playerElement.draggable = true;
+                    
+                    // Ajouter les événements de drag and drop
+                    playerElement.addEventListener('dragstart', handleDragStart);
+                    field.appendChild(playerElement);
+                    
+                    positionCounters[positionType]++;
+                } else {
+                    // Ajouter aux remplaçants
+                    const subElement = document.createElement('div');
+                    subElement.className = 'substitute-player';
+                    subElement.textContent = `${player.firstName} ${player.lastName}`;
+                    subElement.dataset.id = player.id;
+                    subElement.draggable = true;
+                    subElement.addEventListener('dragstart', handleDragStart);
+                    subsContainer.appendChild(subElement);
+                }
             });
         }
         
-        // Handle drag over
+        // Obtenir la classe CSS pour un poste
+        function getPositionClass(position) {
+            switch(position) {
+                case 'Gardien': return 'goalkeeper';
+                case 'Défenseur': return 'defender';
+                case 'Milieu': return 'midfielder';
+                case 'Attaquant': return 'attacker';
+                default: return '';
+            }
+        }
+        
+        // Gestion du drag and drop
+        let draggedPlayer = null;
+        
+        function handleDragStart(e) {
+            draggedPlayer = e.target;
+            e.dataTransfer.setData('text/plain', e.target.dataset.id);
+        }
+        
         function handleDragOver(e) {
             e.preventDefault();
         }
         
-        // Handle drop
-        function handleDrop(e, target) {
+        function handleDrop(e) {
             e.preventDefault();
-            const playerId = e.dataTransfer.getData('text/plain');
-            const playerCard = document.querySelector(`.player-card[data-id="${playerId}"]`);
-            
-            if (playerCard && target) {
-                // Remove player from previous position
-                const previousParent = playerCard.parentElement;
-                if (previousParent) {
-                    previousParent.removeChild(playerCard);
+            if (draggedPlayer) {
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const field = e.target.closest('.field');
+                if (field) {
+                    draggedPlayer.style.top = `${(y / rect.height) * 100}%`;
+                    draggedPlayer.style.left = `${(x / rect.width) * 100}%`;
+                    field.appendChild(draggedPlayer);
                 }
-                
-                // Add player to new position
-                target.appendChild(playerCard);
-                
-                // Update team stats
-                updateTeamStats();
             }
         }
         
-        // Update team statistics
-        function updateTeamStats() {
-            // Team A
-            const teamAPlayers = Array.from(fieldTeamA.querySelectorAll('.player-card')).map(card => {
-                return players.find(p => p.id.toString() === card.dataset.id);
-            });
-            
-            const teamATotal = teamAPlayers.reduce((sum, player) => sum + (player?.points || 0), 0);
-            const teamAAvg = teamAPlayers.length > 0 ? (teamATotal / teamAPlayers.length).toFixed(1) : 0;
-            
-            document.getElementById('teamA-total').textContent = teamATotal;
-            document.getElementById('teamA-avg').textContent = teamAAvg;
-            
-            // Team B
-            const teamBPlayers = Array.from(fieldTeamB.querySelectorAll('.player-card')).map(card => {
-                return players.find(p => p.id.toString() === card.dataset.id);
-            });
-            
-            const teamBTotal = teamBPlayers.reduce((sum, player) => sum + (player?.points || 0), 0);
-            const teamBAvg = teamBPlayers.length > 0 ? (teamBTotal / teamBPlayers.length).toFixed(1) : 0;
-            
-            document.getElementById('teamB-total').textContent = teamBTotal;
-            document.getElementById('teamB-avg').textContent = teamBAvg;
-            
-            // Update substitutes counts
-            const subsA = document.getElementById('subs-teamA').querySelectorAll('.player-card').length;
-            const subsB = document.getElementById('subs-teamB').querySelectorAll('.player-card').length;
-            
-            document.getElementById('subsA-count').textContent = subsA;
-            document.getElementById('subsB-count').textContent = subsB;
-            
-            // Update excluded count
-            const excluded = document.getElementById('excluded-players').querySelectorAll('.player-card').length;
-            document.getElementById('excluded-count').textContent = excluded;
-        }
+        // Ajouter des événements de drag and drop aux terrains
+        document.querySelectorAll('.field').forEach(field => {
+            field.addEventListener('dragover', handleDragOver);
+            field.addEventListener('drop', handleDrop);
+        });
         
-        // Generate teams based on tactics
-        function generateTeams() {
-            const tacticA = tacticsTeamA.value;
-            const tacticB = tacticsTeamB.value;
-            
-            // Clear previous teams
-            document.querySelectorAll('.dropzone').forEach(dz => {
-                dz.innerHTML = '';
-            });
-            
-            // Filter present players and sort by points
-            const presentPlayers = players.filter(player => player.present);
-            const sortedPlayers = [...presentPlayers].sort((a, b) => b.points - a.points);
-            
-            // Assign players to teams (simplified logic)
-            const teamAPlayers = sortedPlayers.slice(0, 11);
-            const teamBPlayers = sortedPlayers.slice(11, 22);
-            const excluded = sortedPlayers.slice(22);
-            
-            // Render players on fields
-            renderPlayersOnField('A', tacticA, teamAPlayers);
-            renderPlayersOnField('B', tacticB, teamBPlayers);
-            
-            // Add substitutes
-            addSubstitutes('A', sortedPlayers.slice(11, 14));
-            addSubstitutes('B', sortedPlayers.slice(14, 17));
-            
-            // Add excluded players
-            excluded.forEach(player => {
-                const playerCard = createPlayerCard(player);
-                excludedPlayers.appendChild(playerCard);
-            });
-            
-            // Update stats
-            updateTeamStats();
-        }
-        
-        // Render players on field
-        function renderPlayersOnField(team, tactic, players) {
-            const field = team === 'A' ? fieldTeamA : fieldTeamB;
-            const positions = [...field.querySelectorAll('.position')];
-            
-            // Clear existing players
-            positions.forEach(pos => {
-                while (pos.children.length > 1) {
-                    pos.removeChild(pos.lastChild);
+        // Ajouter des joueurs initiaux
+        window.addEventListener('DOMContentLoaded', () => {
+            // Ajouter des joueurs par défaut
+            players = [
+                {
+                    id: 1,
+                    firstName: 'Christophe',
+                    lastName: 'Chanal',
+                    stars: 2,
+                    position: 'Milieu',
+                    foot: 'Ambidextre',
+                    attributes: { speed: 2, endurance: 3, technique: 3, heading: 1, physique: 2 },
+                    actions: { excluded: false, acceptedGoalkeeper: false, acceptedDefender: true, acceptedMidfielder: true, acceptedAttacker: false, training: true, event: false, tracing: false, cleaning: false, jerseys: true, extra: false, touchReferee: false, centerReferee: false, unjustifiedAbsence: false, badBehavior: false },
+                    points: 45,
+                    present: true
+                },
+                {
+                    id: 2,
+                    firstName: 'Lionel',
+                    lastName: 'Messi',
+                    stars: 3,
+                    position: 'Attaquant',
+                    foot: 'Gaucher',
+                    attributes: { speed: 3, endurance: 2, technique: 3, heading: 1, physique: 1 },
+                    actions: { excluded: false, acceptedGoalkeeper: false, acceptedDefender: false, acceptedMidfielder: true, acceptedAttacker: true, training: true, event: true, tracing: false, cleaning: false, jerseys: false, extra: true, touchReferee: true, centerReferee: false, unjustifiedAbsence: false, badBehavior: false },
+                    points: 65,
+                    present: true
+                },
+                {
+                    id: 3,
+                    firstName: 'Kylian',
+                    lastName: 'Mbappé',
+                    stars: 3,
+                    position: 'Attaquant',
+                    foot: 'Droitier',
+                    attributes: { speed: 3, endurance: 3, technique: 2, heading: 2, physique: 2 },
+                    actions: { excluded: false, acceptedGoalkeeper: false, acceptedDefender: false, acceptedMidfielder: false, acceptedAttacker: true, training: true, event: false, tracing: false, cleaning: false, jerseys: false, extra: false, touchReferee: true, centerReferee: true, unjustifiedAbsence: false, badBehavior: false },
+                    points: 58,
+                    present: true
+                },
+                {
+                    id: 4,
+                    firstName: 'Neymar',
+                    lastName: 'Jr',
+                    stars: 2,
+                    position: 'Milieu',
+                    foot: 'Gaucher',
+                    attributes: { speed: 2, endurance: 2, technique: 3, heading: 1, physique: 1 },
+                    actions: { excluded: false, acceptedGoalkeeper: false, acceptedDefender: false, acceptedMidfielder: true, acceptedAttacker: true, training: true, event: true, tracing: false, cleaning: false, jerseys: false, extra: true, touchReferee: false, centerReferee: false, unjustifiedAbsence: false, badBehavior: false },
+                    points: 52,
+                    present: true
+                },
+                {
+                    id: 5,
+                    firstName: 'Manuel',
+                    lastName: 'Neuer',
+                    stars: 2,
+                    position: 'Gardien',
+                    foot: 'Droitier',
+                    attributes: { speed: 1, endurance: 2, technique: 1, heading: 1, physique: 2 },
+                    actions: { excluded: false, acceptedGoalkeeper: true, acceptedDefender: true, acceptedMidfielder: false, acceptedAttacker: false, training: true, event: false, tracing: false, cleaning: false, jerseys: false, extra: false, touchReferee: false, centerReferee: true, unjustifiedAbsence: false, badBehavior: false },
+                    points: 32,
+                    present: true
                 }
-            });
+            ];
             
-            // Assign players to positions (simplified)
-            players.forEach((player, index) => {
-                if (index < positions.length) {
-                    const playerCard = createPlayerCard(player);
-                    positions[index].appendChild(playerCard);
-                }
-            });
-        }
-        
-        // Add substitutes to team
-        function addSubstitutes(team, substitutes) {
-            const subContainer = document.getElementById(`subs-team${team}`);
+            // Initialiser l'affichage
+            renderPlayersGrid();
+            renderPlayersList();
+            initSettings();
             
-            substitutes.forEach(player => {
-                const playerCard = createPlayerCard(player);
-                subContainer.appendChild(playerCard);
-            });
-        }
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', initApp);
+            // Composition automatique initiale
+            autoComposeTeams();
+            
+            // Bouton de composition automatique
+            document.getElementById('autoCompositionBtn').addEventListener('click', autoComposeTeams);
+        });
     </script>
 </body>
 </html>
